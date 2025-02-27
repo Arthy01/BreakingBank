@@ -18,6 +18,15 @@ namespace BreakingBank
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
 
+            // Enable CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowEverything",
+                    policy => policy.AllowAnyOrigin()  // Erlaubt jede Domain
+                                    .AllowAnyMethod()  // Erlaubt GET, POST, PUT, DELETE, etc.
+                                    .AllowAnyHeader()); // Erlaubt alle Header
+            });
+
             // Add basic services
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -105,6 +114,8 @@ namespace BreakingBank
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowEverything");
 
             app.UseAuthentication();
             app.UseAuthorization();
