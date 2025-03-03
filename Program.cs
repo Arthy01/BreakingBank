@@ -3,6 +3,8 @@ using BreakingBank.Hubs;
 using BreakingBank.Models;
 using BreakingBank.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -17,15 +19,6 @@ namespace BreakingBank
             // Add Logging functionality
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
-
-            // Enable CORS
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowEverything",
-                    policy => policy.AllowAnyOrigin()  // Erlaubt jede Domain
-                                    .AllowAnyMethod()  // Erlaubt GET, POST, PUT, DELETE, etc.
-                                    .AllowAnyHeader()); // Erlaubt alle Header
-            });
 
             // Add basic services
             builder.Services.AddControllers();
@@ -53,43 +46,38 @@ namespace BreakingBank
                      IssuerSigningKey = new SymmetricSecurityKey(jwtKeyBytes),
                  };
 
-                 // Header Authentication
+                 // Authentication Events
                  options.Events = new JwtBearerEvents
                  {
                      OnMessageReceived = context =>
                      {
                          var accessToken = context.Request.Query["access_token"];
 
-                         if (!string.IsNullOrEmpty(accessToken) &&
-                             context.HttpContext.WebSockets.IsWebSocketRequest)
+                         // Falls die Anfrage von SignalR kommt, JWT-Token aus der URL extrahieren
+                         var path = context.HttpContext.Request.Path;
+                         if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/testingHub"))
                          {
                              context.Token = accessToken;
                          }
 
                          return Task.CompletedTask;
                      },
-
                      OnTokenValidated = context =>
                      {
-                         if (context.HttpContext.Request.Path.Value?.Contains("/negotiate") == true)
-                         {
-                             return Task.CompletedTask;
-                         }
-
                          Console.WriteLine($"Token Validated: {context.SecurityToken}");
                          return Task.CompletedTask;
                      },
-
                      OnChallenge = context =>
                      {
                          Console.WriteLine("Token validation failed: Unauthorized");
                          return Task.CompletedTask;
                      }
                  };
+
              });
 
             builder.Services.AddAuthorization();
-
+            
             // Add Custom Services
             builder.Services.AddScoped<JWTService>();
             
@@ -107,6 +95,8 @@ namespace BreakingBank
 
             var app = builder.Build();
 
+            app.UseCors(builder => builder.WithOrigins("http://breakingbank.de:8000", "http://localhost:8000").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -114,8 +104,6 @@ namespace BreakingBank
             }
 
             app.UseHttpsRedirection();
-
-            app.UseCors("AllowEverything");
 
             app.UseAuthentication();
             app.UseAuthorization();
