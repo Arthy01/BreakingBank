@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BreakingBank.Helpers;
 
 namespace BreakingBank
 {
@@ -55,7 +56,7 @@ namespace BreakingBank
 
                          // Falls die Anfrage von SignalR kommt, JWT-Token aus der URL extrahieren
                          var path = context.HttpContext.Request.Path;
-                         if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/testingHub"))
+                         if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/testingHub") || path.StartsWithSegments("/gameHub")))
                          {
                              context.Token = accessToken;
                          }
@@ -77,9 +78,9 @@ namespace BreakingBank
              });
 
             builder.Services.AddAuthorization();
-            
-            // Add Custom Services
-            builder.Services.AddScoped<JWTService>();
+
+            // Add BreakingBank Services
+            builder.Services.AddBreakinBankServices();
             
             // Configure Https
             CertSettings certSettings = builder.Configuration.GetSection("Certificate").Get<CertSettings>() ?? throw new NullReferenceException("Certificate Section not found!");
@@ -104,12 +105,13 @@ namespace BreakingBank
             }
 
             app.UseHttpsRedirection();
-
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapHub<TestingHub>("/testingHub");
-
+            app.MapHub<GameHub>("/gameHub");
+            
             app.MapControllers();
 
             app.Run();
