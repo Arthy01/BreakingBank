@@ -1,4 +1,6 @@
-﻿namespace BreakingBank.Models.SaveGame
+﻿using System.Text.Json.Serialization;
+
+namespace BreakingBank.Models.SaveGame
 {
     public class DirtyField<T>
     {

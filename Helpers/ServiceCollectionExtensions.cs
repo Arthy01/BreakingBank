@@ -4,7 +4,7 @@ namespace BreakingBank.Helpers
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddBreakinBankServices(this IServiceCollection services)
+        public static IServiceCollection AddBreakingBankServices(this IServiceCollection services)
         {
             // Transistent
 
@@ -13,6 +13,9 @@ namespace BreakingBank.Helpers
 
             // Singleton
             services.AddSingleton<ISaveGameService, SaveGameService>();
+
+            // Hosted
+            services.AddHostedService<GameHubTickService>();
 
             return services;
         }

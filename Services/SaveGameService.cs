@@ -1,4 +1,5 @@
 ﻿using BreakingBank.Models.SaveGame;
+using System.Collections.Concurrent;
 
 namespace BreakingBank.Services
 {
@@ -6,14 +7,14 @@ namespace BreakingBank.Services
     {
         private readonly ILogger<SaveGameService> _logger;
 
-        private Dictionary<string, SaveGame> _activeSaveGames = new();
+        private static ConcurrentDictionary<string, SaveGame> _activeSaveGames = new();
 
         public SaveGameService(ILogger<SaveGameService> logger) 
         {
             _logger = logger;
         }
 
-        public SaveGame GetSaveGame(string player)
+        public SaveGame GetActiveSaveGame(string player)
         {
             return _activeSaveGames[player];
         }
@@ -31,7 +32,7 @@ namespace BreakingBank.Services
 
         public void Unregister(string player)
         {
-            _activeSaveGames.Remove(player);
+            _activeSaveGames.TryRemove(player, out _);
             _logger.LogInformation($"Unregistered {player} in SaveGameService");
         }
     }

@@ -29,15 +29,8 @@ namespace BreakingBank.Models.SaveGame
             }
             else
             {
-                _dirtyData.Remove(fieldName);
+                _dirtyData.Remove(fieldName.ToLower());
             }
-        }
-
-        public string Serialize(bool onlyDirtyData)
-        {
-            return onlyDirtyData ?
-                System.Text.Json.JsonSerializer.Serialize(_dirtyData) :
-                System.Text.Json.JsonSerializer.Serialize(this);
         }
     }
 }

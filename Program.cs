@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BreakingBank.Helpers;
+using BreakingBank.JsonConverters;
 
 namespace BreakingBank
 {
@@ -20,12 +21,18 @@ namespace BreakingBank
             // Add Logging functionality
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
+            builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+            builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
 
             // Add basic services
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSignalR();
+
+            builder.Services.AddSignalR().AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.Converters.Add(new DirtyFieldJsonConverterFactory());
+            });
 
             // Configuration of appsettings
             builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTSettings"));
@@ -80,7 +87,7 @@ namespace BreakingBank
             builder.Services.AddAuthorization();
 
             // Add BreakingBank Services
-            builder.Services.AddBreakinBankServices();
+            builder.Services.AddBreakingBankServices();
             
             // Configure Https
             CertSettings certSettings = builder.Configuration.GetSection("Certificate").Get<CertSettings>() ?? throw new NullReferenceException("Certificate Section not found!");

@@ -4,7 +4,7 @@ namespace BreakingBank.Services
 {
     public interface ISaveGameService
     {
-        SaveGame GetSaveGame(string player);
+        SaveGame GetActiveSaveGame(string player);
 
         void SaveGame(string player, SaveGame saveGame);
 
