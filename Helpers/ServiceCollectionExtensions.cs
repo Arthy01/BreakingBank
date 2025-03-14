@@ -12,9 +12,11 @@ namespace BreakingBank.Helpers
             services.AddScoped<JWTService>();
 
             // Singleton
-            services.AddSingleton<ISaveGameService, SaveGameService>();
+            services.AddSingleton<ISaveGameService, SaveGameServiceMemory>();
+            services.AddSingleton<SaveGameServiceMemory>();
+            services.AddSingleton<SessionService>();
 
-            // Hosted
+            // Hosted (Background Tasks)
             services.AddHostedService<GameHubTickService>();
 
             return services;

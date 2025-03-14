@@ -1,8 +1,10 @@
 ﻿using BreakingBank.Models.SaveGame;
+using BreakingBank.Models;
 using BreakingBank.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
+using System.Security.Claims;
 
 namespace BreakingBank.Hubs
 {
@@ -10,14 +12,15 @@ namespace BreakingBank.Hubs
     public class GameHub : Hub<IGameClient>
     {
         private readonly ILogger<GameHub> _logger;
-        private readonly ISaveGameService _saveGameService;
+        private readonly SessionService _sessionService;
 
+        // ConnectionID, Username
         private static readonly ConcurrentDictionary<string, string> _connections = new();
 
-        public GameHub(ILogger<GameHub> logger, ISaveGameService saveGameService) 
+        public GameHub(ILogger<GameHub> logger, SessionService sessionService) 
         {
             _logger = logger;
-            _saveGameService = saveGameService;
+            _sessionService = sessionService;
         }
 
         public static string? GetUsernameFromConnectionId(string connectionId)
@@ -30,30 +33,50 @@ namespace BreakingBank.Hubs
             return _connections;
         }
 
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
             string? username = Context.User?.Identity?.Name ?? null;
-            if (username == null)
+            int? userID = null;
+
+            if (int.TryParse(Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int result))
+            {
+                userID = result;
+            }
+
+            if (userID == null || username == null)
             {
                 Context.Abort();
-                return base.OnConnectedAsync();
+                return;
+            }
+
+            Session? session = _sessionService.GetUserConnectedSession(new User(userID.Value, username));
+
+            if (session == null)
+            {
+                Context.Abort();
+                return;
             }
 
             _logger.LogInformation($"{username} connected to GameHub");
             _connections[Context.ConnectionId] = username;
-            _saveGameService.Register(username);
-            return base.OnConnectedAsync();
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, session.SaveGame.MetaData.ID);
+            
+            await base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
             string username = Context.User?.Identity?.Name ?? "Unknown User";
+            string? userID = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? null;
+
             _logger.LogInformation($"{username} disconnected from GameHub");
             _connections.TryRemove(Context.ConnectionId, out _);
-            _saveGameService.Unregister(username);
+            
             return base.OnDisconnectedAsync(exception);
         }
 
+        /*
         public async Task AddMoney(int amount)
         {
             string username = Context.User?.Identity?.Name ?? "Unknown User";
@@ -85,5 +108,6 @@ namespace BreakingBank.Hubs
             SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
             await Clients.Client(Context.ConnectionId).ReceiveSaveGame(saveGame);
         }
+        */
     }
 }

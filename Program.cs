@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BreakingBank.Helpers;
 using BreakingBank.JsonConverters;
+using Microsoft.OpenApi.Models;
 
 namespace BreakingBank
 {
@@ -27,7 +28,35 @@ namespace BreakingBank
             // Add basic services
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BreakingBank API", Version = "v1" });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Gib dein JWT-Token hier ein (ohne 'Bearer ')."
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+            });
 
             builder.Services.AddSignalR().AddJsonProtocol(options =>
             {
@@ -36,6 +65,7 @@ namespace BreakingBank
 
             // Configuration of appsettings
             builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTSettings"));
+            builder.Services.Configure<GameSettings>(builder.Configuration.GetSection("GameSettings"));
 
             // Add JWT Authentication and Authorizarion
             JWTSettings jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JWTSettings>() ?? throw new NullReferenceException("JwtSettings Section not found!");
@@ -103,9 +133,9 @@ namespace BreakingBank
 
             var app = builder.Build();
 
-            app.UseCors(builder => builder.WithOrigins("http://breakingbank.de:8000", "http://localhost:8000").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(builder => builder.WithOrigins("http://breakingbank.de:5009", "http://www.breakingbank.de:5009", "https://breakingbank.de:5009", "https://www.breakingbank.de:5009").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment() || true)
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();

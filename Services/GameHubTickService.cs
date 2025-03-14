@@ -1,31 +1,34 @@
 ﻿using BreakingBank.Hubs;
+using BreakingBank.Models;
 using BreakingBank.Models.SaveGame;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 
 namespace BreakingBank.Services
 {
     public class GameHubTickService : BackgroundService
     {
-        private const int TICK_RATE_MS = 100;
 
         private readonly IHubContext<GameHub, IGameClient> _hubContext;
         private readonly ISaveGameService _saveGameService;
         private readonly ILogger<GameHubTickService> _logger;
+        private readonly GameSettings _gameSettings;
 
-        public GameHubTickService(IHubContext<GameHub, IGameClient> hubContext, ISaveGameService saveGameService, ILogger<GameHubTickService> logger)
+        public GameHubTickService(IHubContext<GameHub, IGameClient> hubContext, ISaveGameService saveGameService, IOptions<GameSettings> gameSettings, ILogger<GameHubTickService> logger)
         {
             _hubContext = hubContext;
             _saveGameService = saveGameService;
+            _gameSettings = gameSettings.Value;
             _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("TickService gestartet!");
-
+            /*
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TICK_RATE_MS, stoppingToken);
+                await Task.Delay(_gameSettings.TickDelay, stoppingToken);
 
                 var connections = GameHub.GetAllConnections();
                 if (!connections.Any()) continue;
@@ -52,6 +55,7 @@ namespace BreakingBank.Services
                     }, stoppingToken);
                 }
             }
+            */
         }
     }
 }

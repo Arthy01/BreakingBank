@@ -21,28 +21,24 @@ namespace BreakingBank.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
+            // TODO
+            // UserID needs to be the real userID not just the username
+
             if (request.Username == "admin" && request.Password == "password123")
             {
-                var token = _jwtTokenService.GenerateToken(request.Username);
+                var token = _jwtTokenService.GenerateToken(request.Username, "1");
                 _logger.LogInformation("Issued Token: " + token);
                 return Ok(new { Token = token });
             }
 
             if (request.Username.StartsWith("test") && request.Password == "password123")
             {
-                var token = _jwtTokenService.GenerateToken(request.Username);
+                var token = _jwtTokenService.GenerateToken(request.Username, "1");
                 _logger.LogInformation("Issued Token: " + token);
                 return Ok(new { Token = token });
             }
 
             return Unauthorized(new { Message = "Ungültige Anmeldeinformationen" });
-        }
-
-        [HttpGet("test")]
-        [Authorize]
-        public IActionResult Test()
-        {
-            return Ok(new { Message = "TEST" });
         }
     }
 }
