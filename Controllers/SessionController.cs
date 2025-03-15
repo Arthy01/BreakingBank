@@ -24,6 +24,7 @@ namespace BreakingBank.Controllers
         [HttpGet("username")]
         public ActionResult<string> GetUsername()
         {
+            User user = Models.User.GetByClaims(User);
             string? username = User?.Identity?.Name;
 
             if (string.IsNullOrEmpty(username))
@@ -31,7 +32,7 @@ namespace BreakingBank.Controllers
                 return Unauthorized("Benutzername nicht gefunden.");
             }
 
-            return Ok(username);
+            return Ok($"Username: {user.Username} ({user.ID})");
         }
 
         [HttpPost("create")]
@@ -44,14 +45,14 @@ namespace BreakingBank.Controllers
                 return BadRequest($"Save game with ID {saveGameID} does not exist!");
             }
 
-            if (!_sessionService.CreateSession(user, saveGameID))
+            if (!_sessionService.CreateSession(user, saveGameID, out string msg))
             {
-                return BadRequest("Something went wrong...");
+                return BadRequest(msg);
             }
 
             JoinSession(saveGameID);
 
-            return Ok("Session created!");
+            return Ok(msg);
         }
 
         [HttpPost("join")]
@@ -64,12 +65,12 @@ namespace BreakingBank.Controllers
                 return BadRequest($"Save game with ID {saveGameID} does not exist!");
             }
 
-            if(!_sessionService.JoinSession(user, saveGameID))
+            if(!_sessionService.JoinSession(user, saveGameID, out string msg))
             {
-                return BadRequest("Something went wrong...");
+                return BadRequest(msg);
             }
 
-            return Ok("Session joined!");
+            return Ok(msg);
         }
 
         [HttpPost("leave")]
@@ -77,12 +78,25 @@ namespace BreakingBank.Controllers
         {
             User user = Models.User.GetByClaims(User);
 
-            if (!_sessionService.LeaveSession(user))
+            if (!_sessionService.LeaveSession(user, out string msg))
             {
-                return BadRequest("User is not connected to a Session.");
+                return BadRequest(msg);
             }
 
-            return Ok("Session left!");
+            return Ok(msg);
+        }
+
+        [HttpPost("close")]
+        public ActionResult<string> CloseSession()
+        {
+            User user = Models.User.GetByClaims(User);
+
+            if (!_sessionService.CloseSession(user, out string msg))
+            {
+                return BadRequest(msg);
+            }
+
+            return Ok(msg);
         }
 
         [HttpGet("activeSession")]
@@ -94,6 +108,12 @@ namespace BreakingBank.Controllers
                 return BadRequest("User has not entered a session yet");
 
             return Ok(session);
+        }
+
+        [HttpGet("sessions")]
+        public ActionResult GetAllSessions()
+        {
+            return Ok(_sessionService.GetAllSessions());
         }
     }
 }

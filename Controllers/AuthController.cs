@@ -31,9 +31,16 @@ namespace BreakingBank.Controllers
                 return Ok(new { Token = token });
             }
 
-            if (request.Username.StartsWith("test") && request.Password == "password123")
+            if (request.Username == "test1" && request.Password == "password123")
             {
-                var token = _jwtTokenService.GenerateToken(request.Username, "1");
+                var token = _jwtTokenService.GenerateToken(request.Username, "2");
+                _logger.LogInformation("Issued Token: " + token);
+                return Ok(new { Token = token });
+            }
+
+            if (request.Username == "test2" && request.Password == "password123")
+            {
+                var token = _jwtTokenService.GenerateToken(request.Username, "3");
                 _logger.LogInformation("Issued Token: " + token);
                 return Ok(new { Token = token });
             }

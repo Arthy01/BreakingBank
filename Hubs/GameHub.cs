@@ -36,7 +36,7 @@ namespace BreakingBank.Hubs
 
             if (session == null)
             {
-                _logger.LogInformation($"User {user.Username} is has not joined a session and therefore cant connect to the GameHub!");
+                _logger.LogInformation($"User {user.Username} ({user.ID}) has not joined a session and therefore cant connect to the GameHub!");
                 Context.Abort();
                 return;
             }
