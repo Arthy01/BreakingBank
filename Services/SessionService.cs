@@ -23,6 +23,9 @@ namespace BreakingBank.Services
 
         public bool CreateSession(User user, string saveGameID)
         {
+            if (GetUserConnectedSession(user) != null)
+                return false;
+
             SaveGame? saveGame = _saveGameService.GetSaveGame(saveGameID);
 
             if (saveGame == null)
@@ -34,6 +37,9 @@ namespace BreakingBank.Services
 
         public bool JoinSession(User user, string saveGameID)
         {
+            if (GetUserConnectedSession(user) != null)
+                return false;
+
             Session? session = _activeSessions.Find(x => x.SaveGame.MetaData.ID == saveGameID);
 
             if (session == null)
@@ -48,10 +54,14 @@ namespace BreakingBank.Services
 
         public bool LeaveSession(User user)
         {
-            Session? session = _activeSessions.Find(x => x.Users.Contains(user));
+            Session? session = GetUserConnectedSession(user);
 
             if (session == null) 
                 return false;
+
+            bool userFound = GameHub.GetAllConnections().TryGetValue(user, out string? connectionID);
+            if (connectionID != null)
+                _hubContext.Clients.Client(connectionID).ForceDisconnect();
 
             session.Users.Remove(user);
             return true;

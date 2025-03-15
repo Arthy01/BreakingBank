@@ -6,21 +6,19 @@ namespace BreakingBank.Models
     {
         public int ID { get; }
         public string Username { get; } = string.Empty;
-        public string? ConnectionID { get; } = null;
 
-        public static User GetByClaims(ClaimsPrincipal? claims, string? connectionID = null)
+        public static User GetByClaims(ClaimsPrincipal? claims)
         {
             string username = claims?.Identity?.Name!;
             int userID = int.Parse(claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 
-            return new User(userID, username, connectionID);
+            return new User(userID, username);
         }
 
-        public User(int id, string username, string? connectionID = null)
+        public User(int id, string username)
         {
             ID = id;
             Username = username;
-            ConnectionID = connectionID;
         }
 
         public override bool Equals(object? obj)

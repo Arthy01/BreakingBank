@@ -1,4 +1,5 @@
-﻿using BreakingBank.Services;
+﻿using BreakingBank.Hubs;
+using BreakingBank.Services;
 
 namespace BreakingBank.Helpers
 {

@@ -14,8 +14,8 @@ namespace BreakingBank.Hubs
         private readonly ILogger<GameHub> _logger;
         private readonly SessionService _sessionService;
 
-        // ConnectionID, Username
-        private static readonly ConcurrentDictionary<string, string> _connections = new();
+        // User, connectionID
+        private static readonly ConcurrentDictionary<User, string> _connections = new();
 
         public GameHub(ILogger<GameHub> logger, SessionService sessionService) 
         {
@@ -23,57 +23,45 @@ namespace BreakingBank.Hubs
             _sessionService = sessionService;
         }
 
-        public static string? GetUsernameFromConnectionId(string connectionId)
-        {
-            return _connections.TryGetValue(connectionId, out var username) ? username : null;
-        }
-
-        public static IReadOnlyDictionary<string, string> GetAllConnections()
+        public static IReadOnlyDictionary<User, string> GetAllConnections()
         {
             return _connections;
         }
 
         public override async Task OnConnectedAsync()
         {
-            string? username = Context.User?.Identity?.Name ?? null;
-            int? userID = null;
+            User user = User.GetByClaims(Context.User);
 
-            if (int.TryParse(Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int result))
-            {
-                userID = result;
-            }
-
-            if (userID == null || username == null)
-            {
-                Context.Abort();
-                return;
-            }
-
-            Session? session = _sessionService.GetUserConnectedSession(new User(userID.Value, username));
+            Session? session = _sessionService.GetUserConnectedSession(user);
 
             if (session == null)
             {
+                _logger.LogInformation($"User {user.Username} is has not joined a session and therefore cant connect to the GameHub!");
                 Context.Abort();
                 return;
             }
 
-            _logger.LogInformation($"{username} connected to GameHub");
-            _connections[Context.ConnectionId] = username;
-
             await Groups.AddToGroupAsync(Context.ConnectionId, session.SaveGame.MetaData.ID);
+
+            _logger.LogInformation($"{user.Username} connected to GameHub and was added to Group {session.SaveGame.MetaData.ID}");
+            _connections[user] = Context.ConnectionId;
             
             await base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            string? userID = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? null;
+            User user = User.GetByClaims(Context.User);
 
-            _logger.LogInformation($"{username} disconnected from GameHub");
-            _connections.TryRemove(Context.ConnectionId, out _);
+            _logger.LogInformation($"{user.Username} disconnected from GameHub");
+            _connections.TryRemove(user, out _);
             
             return base.OnDisconnectedAsync(exception);
+        }
+
+        public void Test()
+        {
+            _logger.LogInformation($"{User.GetByClaims(Context.User).Username} sent a Message!");
         }
 
         /*

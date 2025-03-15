@@ -10,6 +10,7 @@ using System.Text;
 using BreakingBank.Helpers;
 using BreakingBank.JsonConverters;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BreakingBank
 {
@@ -58,7 +59,8 @@ namespace BreakingBank
     });
             });
 
-            builder.Services.AddSignalR().AddJsonProtocol(options =>
+            builder.Services.AddSignalR()
+            .AddJsonProtocol(options =>
             {
                 options.PayloadSerializerOptions.Converters.Add(new DirtyFieldJsonConverterFactory());
             });

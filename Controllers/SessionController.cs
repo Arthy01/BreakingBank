@@ -72,6 +72,19 @@ namespace BreakingBank.Controllers
             return Ok("Session joined!");
         }
 
+        [HttpPost("leave")]
+        public ActionResult<string> LeaveSession()
+        {
+            User user = Models.User.GetByClaims(User);
+
+            if (!_sessionService.LeaveSession(user))
+            {
+                return BadRequest("User is not connected to a Session.");
+            }
+
+            return Ok("Session left!");
+        }
+
         [HttpGet("activeSession")]
         public ActionResult<string> GetActiveSession()
         {
