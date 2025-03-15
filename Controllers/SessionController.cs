@@ -113,7 +113,7 @@ namespace BreakingBank.Controllers
         [HttpGet("sessions")]
         public ActionResult GetAllSessions()
         {
-            return Ok(_sessionService.GetAllSessions());
+            return Ok(_sessionService.GetAllActiveSessions());
         }
     }
 }

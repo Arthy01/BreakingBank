@@ -8,7 +8,6 @@ namespace BreakingBank.JsonConverters
     {
         public override DirtyField<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            // Falls du deserialisieren willst, hier anpassen:
             return new DirtyField<T> { Value = JsonSerializer.Deserialize<T>(ref reader, options) };
         }
 

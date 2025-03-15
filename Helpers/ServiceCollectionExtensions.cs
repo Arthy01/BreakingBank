@@ -14,11 +14,11 @@ namespace BreakingBank.Helpers
 
             // Singleton
             services.AddSingleton<ISaveGameService, SaveGameServiceMemory>();
-            services.AddSingleton<SaveGameServiceMemory>();
             services.AddSingleton<SessionService>();
 
-            // Hosted (Background Tasks)
-            services.AddHostedService<GameHubTickService>();
+            // Hosted (With Dependency Injection)
+            services.AddSingleton<GameService>();
+            services.AddHostedService(provider => provider.GetRequiredService<GameService>());
 
             return services;
         }

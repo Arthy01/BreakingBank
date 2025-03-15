@@ -13,14 +13,16 @@ namespace BreakingBank.Hubs
     {
         private readonly ILogger<GameHub> _logger;
         private readonly SessionService _sessionService;
+        private readonly GameService _gameService;
 
         // User, connectionID
         private static readonly ConcurrentDictionary<User, string> _connections = new();
 
-        public GameHub(ILogger<GameHub> logger, SessionService sessionService) 
+        public GameHub(ILogger<GameHub> logger, SessionService sessionService, GameService gameService) 
         {
             _logger = logger;
             _sessionService = sessionService;
+            _gameService = gameService;
         }
 
         public static IReadOnlyDictionary<User, string> GetAllConnections()
@@ -53,6 +55,8 @@ namespace BreakingBank.Hubs
         {
             User user = User.GetByClaims(Context.User);
 
+            _sessionService.LeaveSession(user, out string msg);
+
             _logger.LogInformation($"{user.Username} disconnected from GameHub");
             _connections.TryRemove(user, out _);
             
@@ -62,6 +66,13 @@ namespace BreakingBank.Hubs
         public void Test()
         {
             _logger.LogInformation($"{User.GetByClaims(Context.User).Username} sent a Message!");
+        }
+
+        public void Click(GameService.Clickable clickable) 
+        {
+            User user = User.GetByClaims(Context.User);
+
+            _gameService.OnClickableClicked(user, clickable);
         }
 
         /*

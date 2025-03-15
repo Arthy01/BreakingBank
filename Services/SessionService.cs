@@ -13,6 +13,7 @@ namespace BreakingBank.Services
         private readonly IHubContext<GameHub, IGameClient> _hubContext;
 
         private List<Session> _activeSessions = [];
+        private Dictionary<User, Session> _sessionsByUser = new();
 
         public SessionService(ILogger<SessionService> logger, ISaveGameService saveGameService, IHubContext<GameHub, IGameClient> hubContext)
         {
@@ -21,7 +22,9 @@ namespace BreakingBank.Services
             _hubContext = hubContext;
         }
 
-        public IReadOnlyList<Session> GetAllSessions() => _activeSessions;
+        public IReadOnlyList<Session> GetAllActiveSessions() => _activeSessions;
+        public IReadOnlyDictionary<User, Session> GetAllSessionsByUser() => _sessionsByUser;
+        public Session? GetSessionByUser(User user) => _sessionsByUser.GetValueOrDefault(user);
 
         public bool CreateSession(User user, string saveGameID, out string msg)
         {
@@ -30,6 +33,7 @@ namespace BreakingBank.Services
             if (GetUserConnectedSession(user) != null)
             {
                 msg = "User already in a session: " + GetUserConnectedSession(user)!.SaveGame.MetaData.ID;
+                _logger.LogInformation($"{user.ToString()} tried to create a Session. The action failed because he is already in a session!");
                 return false;
             }
 
@@ -38,10 +42,12 @@ namespace BreakingBank.Services
             if (saveGame == null)
             {
                 msg = $"SaveGame with id {saveGameID} does not exist.";
+                _logger.LogInformation($"{user.ToString()} tried to create a Session. The action failed because the SaveGameID doesnt exist!");
                 return false;
             }
 
             _activeSessions.Add(new Session(saveGame));
+            _logger.LogInformation($"{user.ToString()} successfully created a session with ID {saveGameID}");
             return true;
         }
 
@@ -52,6 +58,7 @@ namespace BreakingBank.Services
             if (GetUserConnectedSession(user) != null)
             {
                 msg = "User already in a session: " + GetUserConnectedSession(user)!.SaveGame.MetaData.ID;
+                _logger.LogInformation(msg);
                 return false;
             }
 
@@ -60,16 +67,20 @@ namespace BreakingBank.Services
             if (session == null)
             {
                 msg = $"There is no session with SaveGameID {saveGameID}!";
+                _logger.LogInformation(msg);
                 return false;
             }
 
             if (session.Users.Contains(user))
             {
                 msg = "The user has joined the session already!";
+                _logger.LogInformation(msg);
                 return false;
             }
 
             session.Users.Add(user);
+            _sessionsByUser[user] = session;
+            _logger.LogInformation(msg);
             return true;
         }
 
@@ -90,6 +101,13 @@ namespace BreakingBank.Services
                 _hubContext.Clients.Client(connectionID).ForceDisconnect();
 
             session.Users.Remove(user);
+            _sessionsByUser.Remove(user);
+
+            if (session.Users.Count == 0)
+            {
+                CloseSession(session);
+            }
+
             return true;
         }
 
@@ -111,9 +129,20 @@ namespace BreakingBank.Services
                 return false;
             }
 
-            _hubContext.Clients.Group(session.SaveGame.MetaData.ID).ForceDisconnect();
-            _activeSessions.Remove(session);
+            CloseSession(session);
+
             return true;
+        }
+
+        private void CloseSession(Session session)
+        {
+            _hubContext.Clients.Group(session.SaveGame.MetaData.ID).ForceDisconnect();
+
+            _activeSessions.Remove(session);
+            foreach (User sessionUser in session.Users)
+            {
+                _sessionsByUser.Remove(sessionUser);
+            }
         }
 
         public Session? GetUserConnectedSession(User user)
