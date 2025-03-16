@@ -3,22 +3,30 @@ namespace BreakingBank.Models.SaveGame
 {
     public class EconomyData : SaveGameData
     {
-        public DirtyField<float> Money { get; } = new();
-        public DirtyField<float> PassiveIncome { get; } = new();
+        public DirtyField<ulong> CleanMoney { get; } = new();
+        public DirtyField<ulong> WetMoney { get; } = new();
+        public DirtyField<ulong> DirtyMoney { get; } = new();
+        public DirtyField<ulong> Cartridges { get; } = new();
+        public DirtyField<ulong> Paper { get; } = new();
 
         public EconomyData()
         {
-            Money.OnDirtyStateChanged += () => HandleDirtyStateChanged(Money, nameof(Money));
-            PassiveIncome.OnDirtyStateChanged += () => HandleDirtyStateChanged(PassiveIncome, nameof(PassiveIncome));
+            CleanMoney.OnDirtyStateChanged += () => HandleDirtyStateChanged(CleanMoney, nameof(CleanMoney));
+            WetMoney.OnDirtyStateChanged += () => HandleDirtyStateChanged(WetMoney, nameof(WetMoney));
+            DirtyMoney.OnDirtyStateChanged += () => HandleDirtyStateChanged(DirtyMoney, nameof(DirtyMoney));
 
-            Money.SetDirty();
-            PassiveIncome.SetDirty();
+            Cartridges.OnDirtyStateChanged += () => HandleDirtyStateChanged(Cartridges, nameof(Cartridges));
+            Paper.OnDirtyStateChanged += () => HandleDirtyStateChanged(Paper, nameof(Paper));
         }
 
         public override void ClearDirtyData()
         {
-            Money.ClearDirty();
-            PassiveIncome.ClearDirty();
+            CleanMoney.ClearDirty();
+            WetMoney.ClearDirty();
+            DirtyMoney.ClearDirty();
+
+            Cartridges.ClearDirty();
+            Paper.ClearDirty();
 
             base.ClearDirtyData();
         }

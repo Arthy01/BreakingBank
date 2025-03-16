@@ -13,7 +13,7 @@ namespace BreakingBank.JsonConverters
 
         public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
-            Type valueType = typeToConvert.GetGenericArguments()[0]; // Generischen Typ `T` extrahieren
+            Type valueType = typeToConvert.GetGenericArguments()[0];
             Type converterType = typeof(DirtyFieldJsonConverter<>).MakeGenericType(valueType);
             return (JsonConverter?)Activator.CreateInstance(converterType);
         }

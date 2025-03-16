@@ -1,4 +1,5 @@
-﻿using BreakingBank.Services;
+﻿using BreakingBank.Hubs;
+using BreakingBank.Services;
 
 namespace BreakingBank.Helpers
 {
@@ -12,10 +13,12 @@ namespace BreakingBank.Helpers
             services.AddScoped<JWTService>();
 
             // Singleton
-            services.AddSingleton<ISaveGameService, SaveGameService>();
+            services.AddSingleton<ISaveGameService, SaveGameServiceMemory>();
+            services.AddSingleton<SessionService>();
 
-            // Hosted
-            services.AddHostedService<GameHubTickService>();
+            // Hosted (With Dependency Injection)
+            services.AddSingleton<GameService>();
+            services.AddHostedService(provider => provider.GetRequiredService<GameService>());
 
             return services;
         }

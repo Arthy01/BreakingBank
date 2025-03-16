@@ -18,7 +18,7 @@ namespace BreakingBank.Services
             _jwtSettings = jwtSettings.Value;
         }
 
-        public string GenerateToken(string username)
+        public string GenerateToken(string username, string userid)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -26,6 +26,7 @@ namespace BreakingBank.Services
             Claim[] claims =
             [
                 new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.NameIdentifier, userid)
             ];
 
             var token = new JwtSecurityToken(

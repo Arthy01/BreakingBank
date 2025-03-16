@@ -1,8 +1,10 @@
 ﻿using BreakingBank.Models.SaveGame;
+using BreakingBank.Models;
 using BreakingBank.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
+using System.Security.Claims;
 
 namespace BreakingBank.Hubs
 {
@@ -10,80 +12,84 @@ namespace BreakingBank.Hubs
     public class GameHub : Hub<IGameClient>
     {
         private readonly ILogger<GameHub> _logger;
-        private readonly ISaveGameService _saveGameService;
+        private readonly SessionService _sessionService;
+        private readonly GameService _gameService;
 
-        private static readonly ConcurrentDictionary<string, string> _connections = new();
+        // User, connectionID
+        private static readonly ConcurrentDictionary<User, string> _connections = new();
 
-        public GameHub(ILogger<GameHub> logger, ISaveGameService saveGameService) 
+        public GameHub(ILogger<GameHub> logger, SessionService sessionService, GameService gameService) 
         {
             _logger = logger;
-            _saveGameService = saveGameService;
+            _sessionService = sessionService;
+            _gameService = gameService;
         }
 
-        public static string? GetUsernameFromConnectionId(string connectionId)
-        {
-            return _connections.TryGetValue(connectionId, out var username) ? username : null;
-        }
-
-        public static IReadOnlyDictionary<string, string> GetAllConnections()
+        public static IReadOnlyDictionary<User, string> GetAllConnections()
         {
             return _connections;
         }
 
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-            string? username = Context.User?.Identity?.Name ?? null;
-            if (username == null)
+            User user = User.GetByClaims(Context.User);
+
+            Session? session = _sessionService.GetUserConnectedSession(user);
+
+            if (session == null)
             {
+                _logger.LogInformation($"User {user.Username} ({user.ID}) has not joined a session and therefore cant connect to the GameHub!");
                 Context.Abort();
-                return base.OnConnectedAsync();
+                return;
             }
 
-            _logger.LogInformation($"{username} connected to GameHub");
-            _connections[Context.ConnectionId] = username;
-            _saveGameService.Register(username);
-            return base.OnConnectedAsync();
+            await Groups.AddToGroupAsync(Context.ConnectionId, session.SaveGame.MetaData.ID);
+
+            _logger.LogInformation($"{user.Username} connected to GameHub and was added to Group {session.SaveGame.MetaData.ID}");
+            _connections[user] = Context.ConnectionId;
+            
+            await base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            _logger.LogInformation($"{username} disconnected from GameHub");
-            _connections.TryRemove(Context.ConnectionId, out _);
-            _saveGameService.Unregister(username);
+            User user = User.GetByClaims(Context.User);
+
+            _sessionService.LeaveSession(user, out string msg);
+
+            _logger.LogInformation($"{user.Username} disconnected from GameHub");
+            _connections.TryRemove(user, out _);
+            
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task AddMoney(int amount)
+        public void Test()
         {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            _logger.LogInformation($"{username} wants to add money");
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            saveGame.Economy.Money.Value = saveGame.Economy.Money.Value + amount >= 0 ? saveGame.Economy.Money.Value + amount : 0;
-           // await Clients.All.ReceiveDirtySaveGame(saveGame.DirtyData, saveGame.Serialize(true));
+            _logger.LogInformation($"{User.GetByClaims(Context.User).Username} sent a Message!");
         }
 
-        public async Task AddPassiveIncome(float amount)
+        public void Click(GameService.Clickable clickable) 
         {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            _logger.LogInformation($"{username} wants to add passive income");
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            saveGame.Economy.PassiveIncome.Value = saveGame.Economy.PassiveIncome.Value + amount >= 0 ? saveGame.Economy.PassiveIncome.Value + amount : 0;
+            User user = User.GetByClaims(Context.User);
+
+            _gameService.OnClickableClicked(user, clickable);
         }
 
-        public async Task GetDirtyData()
+        public void RandomClicks(int clickAmount = 0)
         {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            await Clients.Client(Context.ConnectionId).ReceiveDirtyData(saveGame.DirtyData);
-            saveGame.ClearDirtyData();
-        }
+            User user = User.GetByClaims(Context.User);
 
-        public async Task GetSaveGame()
-        {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            await Clients.Client(Context.ConnectionId).ReceiveSaveGame(saveGame);
+            Random rnd = new Random();
+
+            if (clickAmount <= 0)
+                clickAmount = rnd.Next(1, 100);
+
+            _logger.LogInformation($"Clicking random {clickAmount} times!");
+
+            for (int i = 0; i < clickAmount; i++)
+            {
+                Click((GameService.Clickable)rnd.Next(1, 6));
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ namespace BreakingBank.Models.SaveGame
 
         public void SetDirty()
         {
-            IsDirty = false;
+            IsDirty = true;
             OnDirtyStateChanged?.Invoke();
         }
     }
