@@ -8,6 +8,8 @@ namespace BreakingBank.Services
 {
     public class SessionService
     {
+        public event Action<Session>? OnSessionClosed;
+
         private readonly ILogger<SessionService> _logger;
         private readonly ISaveGameService _saveGameService;
         private readonly IHubContext<GameHub, IGameClient> _hubContext;
@@ -46,8 +48,11 @@ namespace BreakingBank.Services
                 return false;
             }
 
-            _activeSessions.Add(new Session(saveGame));
+            Session session = new Session(saveGame);
+
+            _activeSessions.Add(session);
             _logger.LogInformation($"{user.ToString()} successfully created a session with ID {saveGameID}");
+
             return true;
         }
 
@@ -143,6 +148,8 @@ namespace BreakingBank.Services
             {
                 _sessionsByUser.Remove(sessionUser);
             }
+
+            OnSessionClosed?.Invoke(session);
         }
 
         public Session? GetUserConnectedSession(User user)

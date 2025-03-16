@@ -4,7 +4,7 @@ using BreakingBank.Models.SaveGame;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
-namespace BreakingBank.Services
+namespace BreakingBank.Services.Game
 {
     public class GameService : BackgroundService
     {
@@ -14,6 +14,8 @@ namespace BreakingBank.Services
         private readonly SessionService _sessionService;
         private readonly ILogger<GameService> _logger;
         private readonly GameSettings _gameSettings;
+
+        private readonly AutoClicker _autoClicker;
 
         public enum Clickable
         {
@@ -33,12 +35,14 @@ namespace BreakingBank.Services
             _logger = logger;
 
             OnTick += HandleTick;
+
+            _autoClicker = new(_sessionService, this, _gameSettings);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"TickService gestartet! (TickRate: {1000/_gameSettings.TickDelay} Ticks/s)");
-            
+            _logger.LogInformation($"TickService gestartet! (TickRate: {_gameSettings.TickRate} Ticks/s) (Tick Delay: {_gameSettings.TickDelay} ms)");
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 OnTick?.Invoke();
@@ -47,9 +51,10 @@ namespace BreakingBank.Services
             }
         }
 
+
         private void HandleTick()
         {
-            HandleProcessingUnits();
+            HandleAutoClicker();
 
             SendDirtyDataToAllClients();
         }
@@ -76,10 +81,9 @@ namespace BreakingBank.Services
             }
         }
 
-
-        private void HandleProcessingUnits()
+        private void HandleAutoClicker()
         {
-
+            _autoClicker.HandleAutoClicker();
         }
 
         public void OnClickableClicked(User user, Clickable clickable)
@@ -87,26 +91,34 @@ namespace BreakingBank.Services
             if (!TryGetSession(user, out Session session))
                 return;
 
-            switch (clickable) 
+            OnClickableClicked(session, clickable, 1);
+        }
+
+        public void OnClickableClicked(Session session, Clickable clickable, ulong amount)
+        {
+            if (amount == 0)
+                return;
+
+            switch (clickable)
             {
                 default:
                     return;
                 case Clickable.Cartridge:
-                    session.SaveGame.Economy.Cartridges.Value += 1;
+                    session.SaveGame.Economy.Cartridges.Value += amount;
                     return;
                 case Clickable.Paper:
-                    session.SaveGame.Economy.Paper.Value += 1;
+                    session.SaveGame.Economy.Paper.Value += amount;
                     return;
                 case Clickable.Printer:
-                    session.SaveGame.Processing.Printers.Value!.CurrentClicks.Value += 1;
+                    session.SaveGame.Processing.Printers.Value!.CurrentClicks.Value += amount;
                     session.SaveGame.Processing.Printers.SetDirty();
                     return;
                 case Clickable.WashingMachine:
-                    session.SaveGame.Processing.WashingMachines.Value!.CurrentClicks.Value += 1;
+                    session.SaveGame.Processing.WashingMachines.Value!.CurrentClicks.Value += amount;
                     session.SaveGame.Processing.WashingMachines.SetDirty();
                     return;
                 case Clickable.Dryer:
-                    session.SaveGame.Processing.Dryers.Value!.CurrentClicks.Value += 1;
+                    session.SaveGame.Processing.Dryers.Value!.CurrentClicks.Value += amount;
                     session.SaveGame.Processing.Dryers.SetDirty();
                     return;
             }
