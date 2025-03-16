@@ -1,4 +1,5 @@
-﻿using BreakingBank.Services;
+﻿using BreakingBank.Models.SaveGame;
+using BreakingBank.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,23 @@ namespace BreakingBank.Controllers
             string id = _saveGameService.CreateSaveGame(user, saveGameName);
 
             return Ok($"Save game created with id {id}");
+        }
+
+        [HttpGet("all")]
+        public ActionResult GetAllSaveGames()
+        {
+            return Ok(_saveGameService.GetAllSaveGames());
+        }
+
+        [HttpGet]
+        public ActionResult GetSaveGame(string saveGameID)
+        {
+            SaveGame? saveGame = _saveGameService.GetSaveGame(saveGameID);
+
+            if (saveGame == null)
+                return BadRequest($"SaveGame with ID {saveGameID} does not exist!");
+
+            return Ok(saveGame);
         }
     }
 }

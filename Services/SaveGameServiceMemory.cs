@@ -28,6 +28,11 @@ namespace BreakingBank.Services
             throw new NotImplementedException();
         }
 
+        public List<SaveGame> GetAllSaveGames()
+        {
+            return _createdSaveGames;
+        }
+
         public SaveGame? GetSaveGame(string saveGameID)
         {
             return _createdSaveGames.Where(x => x.MetaData.ID == saveGameID).FirstOrDefault();

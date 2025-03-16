@@ -75,38 +75,21 @@ namespace BreakingBank.Hubs
             _gameService.OnClickableClicked(user, clickable);
         }
 
-        /*
-        public async Task AddMoney(int amount)
+        public void RandomClicks(int clickAmount = 0)
         {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            _logger.LogInformation($"{username} wants to add money");
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            saveGame.Economy.Money.Value = saveGame.Economy.Money.Value + amount >= 0 ? saveGame.Economy.Money.Value + amount : 0;
-           // await Clients.All.ReceiveDirtySaveGame(saveGame.DirtyData, saveGame.Serialize(true));
-        }
+            User user = User.GetByClaims(Context.User);
 
-        public async Task AddPassiveIncome(float amount)
-        {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            _logger.LogInformation($"{username} wants to add passive income");
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            saveGame.Economy.PassiveIncome.Value = saveGame.Economy.PassiveIncome.Value + amount >= 0 ? saveGame.Economy.PassiveIncome.Value + amount : 0;
-        }
+            Random rnd = new Random();
 
-        public async Task GetDirtyData()
-        {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            await Clients.Client(Context.ConnectionId).ReceiveDirtyData(saveGame.DirtyData);
-            saveGame.ClearDirtyData();
-        }
+            if (clickAmount <= 0)
+                clickAmount = rnd.Next(1, 100);
 
-        public async Task GetSaveGame()
-        {
-            string username = Context.User?.Identity?.Name ?? "Unknown User";
-            SaveGame saveGame = _saveGameService.GetActiveSaveGame(username);
-            await Clients.Client(Context.ConnectionId).ReceiveSaveGame(saveGame);
+            _logger.LogInformation($"Clicking random {clickAmount} times!");
+
+            for (int i = 0; i < clickAmount; i++)
+            {
+                Click((GameService.Clickable)rnd.Next(1, 6));
+            }
         }
-        */
     }
 }

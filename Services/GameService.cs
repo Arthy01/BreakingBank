@@ -49,6 +49,8 @@ namespace BreakingBank.Services
 
         private void HandleTick()
         {
+            HandleProcessingUnits();
+
             SendDirtyDataToAllClients();
         }
 
@@ -63,10 +65,21 @@ namespace BreakingBank.Services
                     if (session.SaveGame.DirtyData.Count == 0)
                         return;
 
+                    foreach (var x in session.SaveGame.Processing.Printers.Value!.DirtyData)
+                    {
+                        Console.WriteLine(x.Key + " => " + x.Value);
+                    }
+
                     await _hubContext.Clients.Group(session.SaveGame.MetaData.ID).ReceiveTick(session.SaveGame.DirtyData);
                     session.SaveGame.ClearDirtyData();
                 });
             }
+        }
+
+
+        private void HandleProcessingUnits()
+        {
+
         }
 
         public void OnClickableClicked(User user, Clickable clickable)
@@ -78,11 +91,27 @@ namespace BreakingBank.Services
             {
                 default:
                     return;
+                case Clickable.Cartridge:
+                    session.SaveGame.Economy.Cartridges.Value += 1;
+                    return;
                 case Clickable.Paper:
                     session.SaveGame.Economy.Paper.Value += 1;
                     return;
+                case Clickable.Printer:
+                    session.SaveGame.Processing.Printers.Value!.CurrentClicks.Value += 1;
+                    session.SaveGame.Processing.Printers.SetDirty();
+                    return;
+                case Clickable.WashingMachine:
+                    session.SaveGame.Processing.WashingMachines.Value!.CurrentClicks.Value += 1;
+                    session.SaveGame.Processing.WashingMachines.SetDirty();
+                    return;
+                case Clickable.Dryer:
+                    session.SaveGame.Processing.Dryers.Value!.CurrentClicks.Value += 1;
+                    session.SaveGame.Processing.Dryers.SetDirty();
+                    return;
             }
         }
+
 
         private bool TryGetSession(User user, out Session session)
         {

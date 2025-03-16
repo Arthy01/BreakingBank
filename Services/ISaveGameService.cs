@@ -9,6 +9,7 @@ namespace BreakingBank.Services
         void UpdateSaveGame(SaveGame saveGame);
         SaveGame? GetSaveGame(string saveGameID);
         (List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames) GetAllSaveGames(User user);
+        List<SaveGame> GetAllSaveGames();
         bool SaveGameIDExists(string saveGameID);
 
         /*

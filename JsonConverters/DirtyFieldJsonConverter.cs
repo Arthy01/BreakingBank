@@ -8,7 +8,8 @@ namespace BreakingBank.JsonConverters
     {
         public override DirtyField<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new DirtyField<T> { Value = JsonSerializer.Deserialize<T>(ref reader, options) };
+            T? value = JsonSerializer.Deserialize<T>(ref reader, options);
+            return value != null ? new DirtyField<T> { Value = value } : null;
         }
 
         public override void Write(Utf8JsonWriter writer, DirtyField<T> value, JsonSerializerOptions options)
@@ -16,4 +17,5 @@ namespace BreakingBank.JsonConverters
             JsonSerializer.Serialize(writer, value.Value, options);
         }
     }
+
 }
