@@ -6,8 +6,8 @@ namespace BreakingBank.Hubs
     {
         Task ForceDisconnect();
         Task ReceiveTick(IReadOnlyDictionary<string, object> dirtyData);
-        /*
         Task ReceiveSaveGame(SaveGame saveGame);
+        /*
         Task ReceiveDirtyData(IReadOnlyDictionary<string, object> dirtyData);
         */
     }

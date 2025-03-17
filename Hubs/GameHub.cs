@@ -92,5 +92,29 @@ namespace BreakingBank.Hubs
                 Click((GameService.Clickable)rnd.Next(1, 6));
             }
         }
+
+        public void Upgrade()
+        {
+            User user = User.GetByClaims(Context.User);
+
+            Session? session = _sessionService.GetSessionByUser(user);
+
+            if (session == null)
+                return;
+
+            session.SaveGame.Upgrades.Upgrades[0].Value!.Buy();
+        }
+
+        public async void GetSaveGame()
+        {
+            User user = User.GetByClaims(Context.User);
+
+            Session? session = _sessionService?.GetSessionByUser(user);
+
+            if (session == null)
+                return;
+
+            await Clients.Group(session.SaveGame.MetaData.ID).ReceiveSaveGame(session.SaveGame);
+        }
     }
 }

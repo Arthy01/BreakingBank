@@ -8,6 +8,7 @@ namespace BreakingBank.Models.SaveGame
 
         public EconomyData Economy { get; private set; } = new();
         public ProcessingData Processing { get; private set; } = new();
+        public UpgradeData Upgrades { get; private set; } = new();
 
         [JsonIgnore]
         public IReadOnlyDictionary<string, object> DirtyData => _dirtyData;
@@ -37,6 +38,7 @@ namespace BreakingBank.Models.SaveGame
         {
             Economy.OnDirtyStateChanged += () => OnDirtyStateChanged(Economy, nameof(Economy));
             Processing.OnDirtyStateChanged += () => OnDirtyStateChanged(Processing, nameof(Processing));
+            Upgrades.OnDirtyStateChanged += () => OnDirtyStateChanged(Upgrades, nameof(Upgrades));
 
             ClearDirtyData();
         }
@@ -45,6 +47,7 @@ namespace BreakingBank.Models.SaveGame
         {
             Economy.ClearDirtyData();
             Processing.ClearDirtyData();
+            Upgrades.ClearDirtyData();
         }
 
         private void OnDirtyStateChanged(SaveGameData data, string fieldName)

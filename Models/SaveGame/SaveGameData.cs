@@ -26,7 +26,7 @@ namespace BreakingBank.Models.SaveGame
         {
             if (!field.IsDirty)
                 return;
-
+            
             if (field.Value == null)
                 return;
 
