@@ -19,7 +19,7 @@ namespace BreakingBank.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public IActionResult Login([FromBody] AuthRequest request)
         {
             // TODO
             // UserID needs to be the real userID not just the username
