@@ -70,11 +70,6 @@ namespace BreakingBank.Services.Game
                     if (session.SaveGame.DirtyData.Count == 0)
                         return;
 
-                    foreach (var x in session.SaveGame.Processing.Printers.Value!.DirtyData)
-                    {
-                        Console.WriteLine(x.Key + " => " + x.Value);
-                    }
-
                     await _hubContext.Clients.Group(session.SaveGame.MetaData.ID).ReceiveTick(session.SaveGame.DirtyData);
                     session.SaveGame.ClearDirtyData();
                 });
