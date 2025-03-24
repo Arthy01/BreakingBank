@@ -48,6 +48,11 @@ namespace BreakingBank.Services
             return _createdSaveGames.Find(x => x.MetaData.ID == saveGameID) != null;
         }
 
+        public bool DeleteSaveGame(string saveGameID)
+        {
+            throw new NotImplementedException();
+        }
+
         /*
         public SaveGame GetActiveSaveGame(string player)
         {

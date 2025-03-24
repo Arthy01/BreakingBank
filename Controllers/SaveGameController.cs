@@ -3,6 +3,7 @@ using BreakingBank.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BreakingBank.Models;
 
 namespace BreakingBank.Controllers
 {
@@ -43,6 +44,25 @@ namespace BreakingBank.Controllers
                 return BadRequest($"SaveGame with ID {saveGameID} does not exist!");
 
             return Ok(saveGame);
+        }
+
+        [HttpDelete]
+        public ActionResult DeleteSaveGame(string saveGameID)
+        {
+            User user = Models.User.GetByClaims(User);
+
+            SaveGame? saveGame = _saveGameService.GetSaveGame(saveGameID);
+
+            if (saveGame == null)
+                return NotFound($"SaveGame with ID {saveGameID} does not exist!");
+
+            if (user.ID != saveGame.MetaData.OwnerUserID)
+                return Unauthorized($"User is not authorized to delete the SaveGame with ID {saveGameID}. Only the owner of the SaveGame can delete it.");
+
+            if (!_saveGameService.DeleteSaveGame(saveGameID))
+                return BadRequest("Something went wrong...");
+
+            return Ok();
         }
     }
 }

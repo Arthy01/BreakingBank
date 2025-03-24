@@ -12,6 +12,8 @@ namespace BreakingBank.Services
         List<SaveGame> GetAllSaveGames();
         bool SaveGameIDExists(string saveGameID);
 
+        bool DeleteSaveGame(string saveGameID);
+
         /*
 
         SaveGame GetActiveSaveGame(string player);
