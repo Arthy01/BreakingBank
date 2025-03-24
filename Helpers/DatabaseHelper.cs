@@ -96,14 +96,18 @@ namespace BreakingBank.Helpers
             {
                 return new AuthResponse
                 {
+                    Success = true,
                     Message = "Success",
-                    UserID = reader.GetInt32(0)
+                    UserID = reader.GetInt32(0),
+                    User = new User(reader.GetInt32(0), authRequest.Username)
                 };
             }
             return new AuthResponse
             {
+                Success = false,
                 Message = "Failed",
-                UserID = null
+                UserID = null,
+                User = null
             };
         }
 

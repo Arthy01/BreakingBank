@@ -16,6 +16,7 @@ namespace BreakingBank.Helpers
             // Singleton
             services.AddSingleton<ISaveGameService, SaveGameServiceMemory>();
             services.AddSingleton<SessionService>();
+            services.AddSingleton<DatabaseHelper>();
 
             // Hosted (With Dependency Injection)
             services.AddSingleton<GameService>();
