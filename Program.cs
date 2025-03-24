@@ -11,6 +11,7 @@ using BreakingBank.Helpers;
 using BreakingBank.JsonConverters;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.SignalR;
+using System.Text.Json;
 
 namespace BreakingBank
 {
@@ -29,6 +30,7 @@ namespace BreakingBank
             // Add basic services
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.Converters.Add(new DirtyFieldJsonConverterFactory());
             });
 
@@ -64,6 +66,7 @@ namespace BreakingBank
             builder.Services.AddSignalR()
             .AddJsonProtocol(options =>
             {
+                options.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.PayloadSerializerOptions.Converters.Add(new DirtyFieldJsonConverterFactory());
             });
 

@@ -1,5 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using BreakingBank.Helpers;
+using BreakingBank.JsonConverters;
 namespace BreakingBank.Models.SaveGame
 {
     public class SaveGame
@@ -22,10 +24,68 @@ namespace BreakingBank.Models.SaveGame
             return new SaveGame(meta);
         }
 
-        public static SaveGame Load(string saveGameID)
+        public static bool Parse(string data, out SaveGame saveGame)
         {
-            return null;
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = true
+            };
+
+            try
+            {
+                using var doc = JsonDocument.Parse(data);
+                
+                if (!doc.RootElement.TryGetProperty("metaData", out JsonElement metaDataElement))
+                {
+                    saveGame = null!;
+                    return false;
+                }
+
+                // MetaData-Teil als JSON extrahieren
+                var metaDataJson = metaDataElement.GetRawText();
+                Console.WriteLine(metaDataJson);
+                // In echtes Objekt umwandeln
+                var metaData = JsonSerializer.Deserialize<MetaData>(metaDataJson, options);
+                if (metaData == null)
+                {
+                    saveGame = null!;
+                    return false;
+                }
+
+                Console.WriteLine("name: " + metaData.Name);
+
+                if (!doc.RootElement.TryGetProperty("economy", out JsonElement eco))
+                {
+                    saveGame = null!;
+                    return false;
+                }
+
+                var economyDataJson = eco.GetRawText();
+                Console.WriteLine(economyDataJson);
+                EconomyData e = new EconomyData
+                    (
+                    eco.GetProperty("cleanMoney").GetInt64(),
+                    eco.GetProperty("wetMoney").GetInt64(),
+                    eco.GetProperty("dirtyMoney").GetInt64(),
+                    eco.GetProperty("cartridges").GetInt64(),
+                    eco.GetProperty("paper").GetInt64()
+                    );
+                Console.WriteLine(e);
+                Console.WriteLine(e.Paper.Value);
+
+                saveGame = new SaveGame(metaData);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Deserialization failed: " + ex.Message + ex.StackTrace);
+                saveGame = null!;
+                return false;
+            }
         }
+
+
 
         private SaveGame(MetaData metaData)
         {

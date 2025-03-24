@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BreakingBank.Models;
+using BreakingBank.Helpers;
 
 namespace BreakingBank.Controllers
 {
@@ -13,20 +14,24 @@ namespace BreakingBank.Controllers
     public class SaveGameController : ControllerBase
     {
         private readonly ISaveGameService _saveGameService;
+        private readonly DatabaseHelper _databaseHelper;
 
-        public SaveGameController(ISaveGameService saveGameService)
+        public SaveGameController(ISaveGameService saveGameService, DatabaseHelper databaseHelper)
         {
             _saveGameService = saveGameService;
+            _databaseHelper = databaseHelper;
         }
 
         [HttpPost("create")]
-        public ActionResult<string> CreateSaveGame(string saveGameName)
+        public async Task<ActionResult<string>> CreateSaveGame(string saveGameName)
         {
             Models.User user = Models.User.GetByClaims(User);
 
             string id = _saveGameService.CreateSaveGame(user, saveGameName);
+            bool success = await _databaseHelper.CreateSaveGame(_saveGameService.GetSaveGame(id)!);
 
-            return Ok($"Save game created with id {id}");
+            
+            return Ok($"Save game created with id {id} => " + success);
         }
 
         [HttpGet("all")]

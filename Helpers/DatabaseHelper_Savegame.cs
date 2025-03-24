@@ -1,9 +1,68 @@
 ﻿// Contains only SaveGame related logic of the DatabaseHelper
 
+using BreakingBank.JsonConverters;
+using BreakingBank.Models;
+using BreakingBank.Models.SaveGame;
+using Npgsql;
+using NpgsqlTypes;
+using System.Text.Json;
+
 namespace BreakingBank.Helpers
 {
     public partial class DatabaseHelper
     {
+        public async Task<bool> CreateSaveGame(SaveGame saveGame)
+        {
+            await using NpgsqlCommand command = _dataSource.CreateCommand("INSERT INTO savegames (user_id, data, savegame_id) VALUES (@userId, @savegame, @savegame_id)");
+            command.Parameters.AddWithValue("userId", saveGame.MetaData.OwnerUserID);
+            command.Parameters.AddWithValue("savegame", NpgsqlDbType.Jsonb, SerializeSavegame(saveGame));
+            command.Parameters.AddWithValue("savegame_id", Guid.Parse(saveGame.MetaData.ID));
+            
+            int affectedRows = await command.ExecuteNonQueryAsync();
+            return affectedRows > 0;
+        }
+
+        public async Task<bool> UpdateSaveGame(SaveGame saveGame)
+        {
+            await using NpgsqlCommand command = _dataSource.CreateCommand("UPDATE savegames SET data = @savegame WHERE savegame_id = @savegame_id");
+            command.Parameters.AddWithValue("savegame", NpgsqlDbType.Jsonb, SerializeSavegame(saveGame));
+            command.Parameters.AddWithValue("savegame_id", Guid.Parse(saveGame.MetaData.ID));
+
+            int affectedRows = await command.ExecuteNonQueryAsync();
+            return affectedRows > 0;
+        }
+
+        public async Task<bool> DeleteSaveGame(SaveGame saveGame)
+        {
+            return await DeleteSaveGame(saveGame.MetaData.ID);
+        }
+
+        public async Task<bool> DeleteSaveGame(string saveGameID)
+        {
+            return false;
+        }
+
+        public async Task<SaveGame?> GetSaveGame(string saveGameID)
+        {
+            return null;
+        }
+
+        public async Task<List<SaveGame>> GetAllSaveGamesByUser(User user)
+        {
+            return new List<SaveGame>();
+        }
+
+        private string SerializeSavegame(SaveGame saveGame)
+        {
+            JsonSerializerOptions options = new();
+            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.Converters.Add(new DirtyFieldJsonConverterFactory());
+            Console.WriteLine(JsonSerializer.Serialize(saveGame, options));
+            return JsonSerializer.Serialize(saveGame, options);
+        }
+
+
+        /*
         public async Task GetAllSavegames()
         {
             await using var command = _dataSource.CreateCommand("SELECT * FROM savegames");
@@ -51,5 +110,6 @@ namespace BreakingBank.Helpers
             command.Parameters.AddWithValue("savegameId", savegameId);
             await command.ExecuteNonQueryAsync();
         }
+        */
     }
 }
