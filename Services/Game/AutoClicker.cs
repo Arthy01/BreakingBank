@@ -8,6 +8,7 @@ namespace BreakingBank.Services.Game
         private readonly SessionService _sessionService;
         private readonly GameService _gameService;
         private readonly GameSettings _gameSettings;
+        private readonly ILogger<GameService> _logger;
 
         private Cache _progressCache = new();
 
@@ -46,12 +47,27 @@ namespace BreakingBank.Services.Game
             }
         }
 
-        public AutoClicker(SessionService sessionService, GameService gameService, GameSettings gameSettings)
+        private struct UpgradeData
+        {
+            public double EmployeeCount { get; private set; }
+            public double EmployeeSpeed { get; private set; }
+            public double EmployeeEfficiency { get; private set; }
+
+            public UpgradeData(double empCount, double empSpeed, double empEfficiency)
+            {
+                EmployeeCount = empCount;
+                EmployeeSpeed = empSpeed;
+                EmployeeEfficiency = empEfficiency;
+            }
+        }
+
+        public AutoClicker(SessionService sessionService, GameService gameService, GameSettings gameSettings, ILogger<GameService> logger)
         {
             _sessionService = sessionService;
             _gameService = gameService;
             _gameSettings = gameSettings;
-
+            _logger = logger;
+            
             _sessionService.OnSessionClosed += _progressCache.RemoveSession;
         }
 
@@ -64,7 +80,9 @@ namespace BreakingBank.Services.Game
                     if (clickable == GameService.Clickable.Undefined)
                         continue;
 
-                    double clicksPerSecond = 0.0; // Ausgedacht, wird duch upgrades bestimmt
+                    UpgradeData upgradeData = GetUpgradesForClickable(session, clickable);
+
+                    double clicksPerSecond = upgradeData.EmployeeCount * upgradeData.EmployeeSpeed * upgradeData.EmployeeEfficiency;
 
                     double clicksThisTick = clicksPerSecond / _gameSettings.TickRate;
 
@@ -72,6 +90,54 @@ namespace BreakingBank.Services.Game
                     _gameService.OnClickableClicked(session, clickable, clicksToPerform);
                 }
             }
+        }
+
+        private UpgradeData GetUpgradesForClickable(Session session, GameService.Clickable clickable)
+        {
+            List<DirtyField<Upgrade>> upgrades = session.SaveGame.Upgrades.Upgrades;
+
+            switch (clickable)
+            {
+                case GameService.Clickable.Paper:
+                    return new UpgradeData(
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeCount_Paper, upgrades, true),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeSpeed_Paper, upgrades),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeEfficiency_Paper, upgrades));
+
+                case GameService.Clickable.Cartridge:
+                    return new UpgradeData(
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeCount_Cartridge, upgrades, true),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeSpeed_Cartridge, upgrades),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeEfficiency_Cartridge, upgrades));
+
+                case GameService.Clickable.Printer:
+                    return new UpgradeData(
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeCount_Printer, upgrades, true),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeSpeed_Printer, upgrades),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeEfficiency_Printer, upgrades));
+
+                case GameService.Clickable.WashingMachine:
+                    return new UpgradeData(
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeCount_WashingMachine, upgrades, true),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeSpeed_WashingMachine, upgrades),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeEfficiency_WashingMachine, upgrades));
+
+                case GameService.Clickable.Dryer:
+                    return new UpgradeData(
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeCount_Dryer, upgrades, true),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeSpeed_Dryer, upgrades),
+                        GetUpgradeValueByID(Upgrade.UpgradeID.EmployeeEfficiency_Dryer, upgrades));
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private double GetUpgradeValueByID(Upgrade.UpgradeID id, List<DirtyField<Upgrade>> upgrades, bool asInt = false)
+        {
+            Upgrade upgrade = upgrades.Find(x => x.Value!.ID == id)!.Value!;
+
+            return asInt ? upgrade.GetEffectInt() : upgrade.GetEffectDouble();
         }
     }
 }

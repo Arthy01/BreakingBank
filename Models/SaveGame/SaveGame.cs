@@ -186,6 +186,9 @@ namespace BreakingBank.Models.SaveGame
             List<DirtyField<Upgrade>> upgradesList = new();
             foreach (JsonElement upgradeElement in upgradesElement.EnumerateArray())
             {
+                if (!upgradeElement.TryGetProperty("id", out JsonElement idElement))
+                    continue;
+
                 if (!upgradeElement.TryGetProperty("name", out JsonElement nameElement))
                     continue;
 
@@ -204,15 +207,20 @@ namespace BreakingBank.Models.SaveGame
                 if (!upgradeElement.TryGetProperty("costIncrease", out JsonElement costIncreaseElement))
                     continue;
 
+                if (!upgradeElement.TryGetProperty("effectIncrease", out JsonElement effectIncreaseElement))
+                    continue;
+
                 upgradesList.Add(new DirtyField<Upgrade>()
                 {
                     Value = new Upgrade(
+                    (Upgrade.UpgradeID)idElement.GetInt32(),
                     nameElement.GetString(),
                     descriptionElement.GetString(),
                     levelElement.GetUInt64(),
                     baseCostElement.GetUInt64(),
                     costIncreaseElement.GetUInt64(),
-                    baseEffectElement.GetDouble()
+                    baseEffectElement.GetDouble(),
+                    effectIncreaseElement.GetDouble()
                     )
                 });
             }

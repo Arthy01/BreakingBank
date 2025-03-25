@@ -36,7 +36,7 @@ namespace BreakingBank.Services.Game
 
             OnTick += HandleTick;
 
-            _autoClicker = new(_sessionService, this, _gameSettings);
+            _autoClicker = new(_sessionService, this, _gameSettings, logger);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -86,7 +86,9 @@ namespace BreakingBank.Services.Game
             if (!TryGetSession(user, out Session session))
                 return;
 
-            OnClickableClicked(session, clickable, 1);
+            ulong amount = (ulong)session.SaveGame.Upgrades.Upgrades.Find(x => x.Value!.ID == Upgrade.UpgradeID.Player_Efficiency)!.Value!.GetEffectInt();
+
+            OnClickableClicked(session, clickable, amount);
         }
 
         public void OnClickableClicked(Session session, Clickable clickable, ulong amount)
