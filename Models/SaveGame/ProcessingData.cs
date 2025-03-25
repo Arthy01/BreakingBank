@@ -8,9 +8,22 @@
 
         public ProcessingData()
         {
+            RegisterEvents();
+        }
+
+        public ProcessingData(DirtyField<ProcessingUnit> printers, DirtyField<ProcessingUnit> washingMachines, DirtyField<ProcessingUnit> dryers)
+        {
+            Printers = printers;
+            WashingMachines = washingMachines;
+            Dryers = dryers;
+
+            RegisterEvents();
+        }
+
+        private void RegisterEvents()
+        {
             Printers.OnDirtyStateChanged += () => HandleDirtyStateChanged(Printers, nameof(Printers));
             BindSetDirtyEvents(Printers);
-            //Printers.Value.CurrentClicks.OnDirtyStateChanged += () => Printers.SetDirty();
 
             WashingMachines.OnDirtyStateChanged += () => HandleDirtyStateChanged(WashingMachines, nameof(WashingMachines));
             BindSetDirtyEvents(WashingMachines);

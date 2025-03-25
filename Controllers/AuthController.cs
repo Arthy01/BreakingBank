@@ -25,9 +25,9 @@ namespace BreakingBank.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AuthRequest request)
         {
-            string x = "{\"economy\":{\"paper\":187,\"wetMoney\":0,\"cartridges\":0,\"cleanMoney\":0,\"dirtyMoney\":0},\"metaData\":{\"id\":\"b8a3e7f1-ff3b-4c4b-85e4-544286f31d14\",\"name\":\"TestSaveGame\",\"ownerUserID\":1,\"coOwnerUserIDs\":[]},\"upgrades\":{\"upgrades\":[{\"name\":\"Test Upgrade\",\"level\":0,\"baseCost\":100,\"baseEffect\":1,\"description\":\"Test Description\",\"costIncrease\":50}]},\"processing\":{\"dryers\":{\"count\":0,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0},\"printers\":{\"count\":0,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0},\"washingMachines\":{\"count\":0,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0}}}";
+            string x = "{\"economy\":{\"paper\":187,\"wetMoney\":0,\"cartridges\":0,\"cleanMoney\":0,\"dirtyMoney\":0},\"metaData\":{\"id\":\"b8a3e7f1-ff3b-4c4b-85e4-544286f31d14\",\"name\":\"TestSaveGame\",\"ownerUserID\":1,\"coOwnerUserIDs\":[]},\"upgrades\":{\"upgrades\":[{\"name\":\"Test Upgrade\",\"level\":111,\"baseCost\":100,\"baseEffect\":1,\"description\":\"Test Description\",\"costIncrease\":50}]},\"processing\":{\"dryers\":{\"count\":2,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0},\"printers\":{\"count\":0,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0},\"washingMachines\":{\"count\":0,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0}}}";
             bool s = SaveGame.Parse(x, out SaveGame saveGame);
-            Console.WriteLine(s);
+            Console.WriteLine(s + " => " + saveGame.Economy.Paper.Value + " | " + saveGame.Upgrades.Upgrades[0].Value.Level.Value + " | " + saveGame.Processing.Dryers.Value.Count.Value);
             // TODO
             // UserID needs to be the real userID not just the username
 

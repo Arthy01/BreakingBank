@@ -16,7 +16,6 @@ namespace BreakingBank.Models.SaveGame
             ID = Guid.NewGuid().ToString();
         }
 
-        [JsonConstructor]
         public MetaData(string id, string name, int ownerUserID, List<int> coOwnerUserIDs)
         {
             ID = id;

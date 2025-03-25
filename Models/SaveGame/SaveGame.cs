@@ -26,7 +26,7 @@ namespace BreakingBank.Models.SaveGame
 
         public static bool Parse(string data, out SaveGame saveGame)
         {
-            var options = new JsonSerializerOptions
+            JsonSerializerOptions options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true
@@ -34,47 +34,30 @@ namespace BreakingBank.Models.SaveGame
 
             try
             {
-                using var doc = JsonDocument.Parse(data);
+                using JsonDocument doc = JsonDocument.Parse(data);
                 
-                if (!doc.RootElement.TryGetProperty("metaData", out JsonElement metaDataElement))
-                {
-                    saveGame = null!;
-                    return false;
-                }
+                MetaData? metaData = DeserializeMetaData(doc.RootElement);
 
-                // MetaData-Teil als JSON extrahieren
-                var metaDataJson = metaDataElement.GetRawText();
-                Console.WriteLine(metaDataJson);
-                // In echtes Objekt umwandeln
-                var metaData = JsonSerializer.Deserialize<MetaData>(metaDataJson, options);
                 if (metaData == null)
-                {
-                    saveGame = null!;
-                    return false;
-                }
+                    throw new Exception("Deserialization of MetaData has failed!");
 
-                Console.WriteLine("name: " + metaData.Name);
+                EconomyData? economyData = DeserializeEconomyData(doc.RootElement);
 
-                if (!doc.RootElement.TryGetProperty("economy", out JsonElement eco))
-                {
-                    saveGame = null!;
-                    return false;
-                }
+                if (economyData == null)
+                    throw new Exception("Deserialization of EconomyData has failed!");
 
-                var economyDataJson = eco.GetRawText();
-                Console.WriteLine(economyDataJson);
-                EconomyData e = new EconomyData
-                    (
-                    eco.GetProperty("cleanMoney").GetInt64(),
-                    eco.GetProperty("wetMoney").GetInt64(),
-                    eco.GetProperty("dirtyMoney").GetInt64(),
-                    eco.GetProperty("cartridges").GetInt64(),
-                    eco.GetProperty("paper").GetInt64()
-                    );
-                Console.WriteLine(e);
-                Console.WriteLine(e.Paper.Value);
+                ProcessingData? processingData = DeserializeProcessingData(doc.RootElement);
 
-                saveGame = new SaveGame(metaData);
+                if (processingData == null)
+                    throw new Exception("Deserialization of ProcessingData has failed!");
+
+                UpgradeData? upgradeData = DeserializeUpgradeData(doc.RootElement);
+
+                if (upgradeData == null)
+                    throw new Exception("Deserialization of UpgradeData has failed!");
+
+                saveGame = new SaveGame(metaData, economyData, processingData, upgradeData);
+
                 return true;
             }
             catch (Exception ex)
@@ -85,11 +68,178 @@ namespace BreakingBank.Models.SaveGame
             }
         }
 
+        private static MetaData? DeserializeMetaData(JsonElement root)
+        {
+            if (!root.TryGetProperty("metaData", out JsonElement metaDataElement))
+                return null;
+
+            if (!metaDataElement.TryGetProperty("id", out JsonElement id))
+                return null;
+
+            if (!metaDataElement.TryGetProperty("name", out JsonElement name))
+                return null;
+
+            if (!metaDataElement.TryGetProperty("ownerUserID", out JsonElement ownerUserID))
+                return null;
+
+            if (!metaDataElement.TryGetProperty("coOwnerUserIDs", out JsonElement coUserOwnerIDs))
+                return null;
+
+            List<int> coUserIDs = new();
+            foreach (JsonElement idElement in coUserOwnerIDs.EnumerateArray())
+            {
+                if (idElement.TryGetInt32(out int coID))
+                {
+                    coUserIDs.Add(coID);
+                }
+            }
+
+            return new MetaData(id.GetString(), name.GetString(), ownerUserID.GetInt32(), coUserIDs);
+        }
+
+        private static EconomyData? DeserializeEconomyData(JsonElement root)
+        {
+            if (!root.TryGetProperty("economy", out JsonElement economyDataElement))
+                return null;
+
+            if (!economyDataElement.TryGetProperty("paper", out JsonElement paper))
+                return null;
+
+            if (!economyDataElement.TryGetProperty("wetMoney", out JsonElement wetMoney))
+                return null;
+
+            if (!economyDataElement.TryGetProperty("cartridges", out JsonElement cartridges))
+                return null;
+
+            if (!economyDataElement.TryGetProperty("cleanMoney", out JsonElement cleanMoney))
+                return null;
+
+            if (!economyDataElement.TryGetProperty("dirtyMoney", out JsonElement dirtyMoney))
+                return null;
+
+            return new EconomyData(
+                cleanMoney.GetUInt64(),
+                wetMoney.GetUInt64(),
+                dirtyMoney.GetUInt64(),
+                cartridges.GetUInt64(),
+                paper.GetUInt64()
+                );
+        }
+
+        private static ProcessingData? DeserializeProcessingData(JsonElement root)
+        {
+            if (!root.TryGetProperty("processing", out JsonElement processingDataElement))
+                return null;
+
+            if (!processingDataElement.TryGetProperty("dryers", out JsonElement dryersDataElement))
+                return null;
+
+            if (!processingDataElement.TryGetProperty("printers", out JsonElement printersDataElement))
+                return null;
+
+            if (!processingDataElement.TryGetProperty("washingMachines", out JsonElement washingMachinesDataElement))
+                return null;
+
+            ProcessingUnit? printerUnit = DeserializeProcessingUnit(printersDataElement);
+            if (printerUnit == null) 
+                return null;
+
+            ProcessingUnit? washingUnit = DeserializeProcessingUnit(washingMachinesDataElement);
+            if (washingUnit == null) 
+                return null;
+            
+            ProcessingUnit? dryerUnit = DeserializeProcessingUnit(dryersDataElement);
+            if (dryerUnit == null)
+                return null;
+
+            return new ProcessingData(new() { Value = printerUnit }, new() { Value = washingUnit }, new() { Value = dryerUnit });
+        }
+
+        private static ProcessingUnit? DeserializeProcessingUnit(JsonElement unitElement)
+        {
+            if (!unitElement.TryGetProperty("count", out JsonElement countElement))
+                return null;
+
+            if (!unitElement.TryGetProperty("maxCapacity", out JsonElement maxCapacityElement))
+                return null;
+
+            if (!unitElement.TryGetProperty("usedCapacity", out JsonElement usedCapacityElement))
+                return null;
+
+            if (!unitElement.TryGetProperty("currentClicks", out JsonElement currentClicksElement))
+                return null;
+
+            if (!unitElement.TryGetProperty("requiredClicks", out JsonElement requiredClicksElement))
+                return null;
+
+            return new ProcessingUnit(
+                countElement.GetUInt64(), 
+                usedCapacityElement.GetUInt64(), 
+                maxCapacityElement.GetUInt64(), 
+                currentClicksElement.GetUInt64(), 
+                requiredClicksElement.GetUInt64()
+                );
+        }
+
+        private static UpgradeData? DeserializeUpgradeData(JsonElement root)
+        {
+            if (!root.TryGetProperty("upgrades", out JsonElement upgradesDataElement))
+                return null;
+
+            if (!upgradesDataElement.TryGetProperty("upgrades", out JsonElement upgradesElement))
+                return null;
+
+            List<DirtyField<Upgrade>> upgradesList = new();
+            foreach (JsonElement upgradeElement in upgradesElement.EnumerateArray())
+            {
+                if (!upgradeElement.TryGetProperty("name", out JsonElement nameElement))
+                    continue;
+
+                if (!upgradeElement.TryGetProperty("level", out JsonElement levelElement))
+                    continue;
+
+                if (!upgradeElement.TryGetProperty("baseCost", out JsonElement baseCostElement))
+                    continue;
+
+                if (!upgradeElement.TryGetProperty("baseEffect", out JsonElement baseEffectElement))
+                    continue;
+
+                if (!upgradeElement.TryGetProperty("description", out JsonElement descriptionElement))
+                    continue;
+
+                if (!upgradeElement.TryGetProperty("costIncrease", out JsonElement costIncreaseElement))
+                    continue;
+
+                upgradesList.Add(new DirtyField<Upgrade>()
+                {
+                    Value = new Upgrade(
+                    nameElement.GetString(),
+                    descriptionElement.GetString(),
+                    levelElement.GetUInt64(),
+                    baseCostElement.GetUInt64(),
+                    costIncreaseElement.GetUInt64(),
+                    baseEffectElement.GetDouble()
+                    )
+                });
+            }
+
+            return new UpgradeData(upgradesList);
+        }
 
 
         private SaveGame(MetaData metaData)
         {
             MetaData = metaData;
+
+            Initialize();
+        }
+
+        public SaveGame(MetaData metaData, EconomyData economyData, ProcessingData processingData, UpgradeData upgradeData)
+        {
+            MetaData = metaData;
+            Economy = economyData;
+            Processing = processingData;
+            Upgrades = upgradeData;
 
             Initialize();
         }

@@ -9,10 +9,11 @@
         public ulong CostIncrease { get; }
         public double BaseEffect { get; }
 
-        public Upgrade(string name, string description, ulong baseCost, ulong costIncrease, double baseEffect)
+        public Upgrade(string name, string description, ulong level, ulong baseCost, ulong costIncrease, double baseEffect)
         {
             Name = name;
             Description = description;
+            Level = new DirtyField<ulong>() { Value = level };
             BaseCost = baseCost;
             CostIncrease = costIncrease;
             BaseEffect = baseEffect;

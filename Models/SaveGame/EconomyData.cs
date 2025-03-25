@@ -16,14 +16,14 @@ namespace BreakingBank.Models.SaveGame
             RegisterEvents();
         }
 
-        public EconomyData(long cleanMoney, long wetMoney, long dirtyMoney, long cartridges, long paper)
+        public EconomyData(ulong cleanMoney, ulong wetMoney, ulong dirtyMoney, ulong cartridges, ulong paper)
         {
-            CleanMoney = new() { Value = Convert.ToUInt64(cleanMoney) };
-            WetMoney = new() { Value = Convert.ToUInt64(wetMoney) };
-            DirtyMoney = new() { Value = Convert.ToUInt64(dirtyMoney) };
-            Cartridges = new() { Value = Convert.ToUInt64(cartridges) };
-            Paper = new() { Value = Convert.ToUInt64(paper) };
-
+            CleanMoney = new() { Value = cleanMoney };
+            WetMoney = new() { Value = wetMoney };
+            DirtyMoney = new() { Value = dirtyMoney };
+            Cartridges = new() { Value = cartridges };
+            Paper = new() { Value = paper };
+            
             RegisterEvents();
         }
 
