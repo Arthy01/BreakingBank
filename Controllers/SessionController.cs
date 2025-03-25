@@ -50,7 +50,7 @@ namespace BreakingBank.Controllers
                 return BadRequest(msg);
             }
 
-            JoinSession(saveGameID);
+            await JoinSession(saveGameID);
 
             return Ok(msg);
         }

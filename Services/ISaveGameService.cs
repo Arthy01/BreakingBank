@@ -9,7 +9,6 @@ namespace BreakingBank.Services
         Task<bool> UpdateSaveGame(SaveGame saveGame);
         Task<SaveGame?> GetSaveGame(string saveGameID);
         Task<(List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames)> GetAllSaveGames(User user);
-        Task<List<SaveGame>> GetAllSaveGames();
         Task<bool> SaveGameIDExists(string saveGameID);
 
         Task<bool> DeleteSaveGame(string saveGameID);

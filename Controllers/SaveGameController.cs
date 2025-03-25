@@ -25,17 +25,11 @@ namespace BreakingBank.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<string>> CreateSaveGame(string saveGameName)
         {
-            Models.User user = Models.User.GetByClaims(User);
+            User user = Models.User.GetByClaims(User);
 
             string id = await _saveGameService.CreateSaveGame(user, saveGameName);
             
             return Ok($"Save game created with id {id}");
-        }
-
-        [HttpGet("all")]
-        public ActionResult GetAllSaveGames()
-        {
-            return Ok(_saveGameService.GetAllSaveGames());
         }
 
         [HttpGet]
@@ -66,6 +60,16 @@ namespace BreakingBank.Controllers
                 return BadRequest("Something went wrong...");
 
             return Ok();
+        }
+
+        [HttpGet("user")]
+        public async Task<ActionResult> GetSaveGamesByUser()
+        {
+            User user = Models.User.GetByClaims(User);
+
+            (List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames) = await _saveGameService.GetAllSaveGames(user);
+
+            return Ok(new { Owned = ownedSaveGames, CoOwned = coOwnedSaveGames });
         }
     }
 }

@@ -23,17 +23,14 @@ namespace BreakingBank.Services
 
         public async Task<bool> DeleteSaveGame(string saveGameID)
         {
-            throw new NotImplementedException();
+            return await _databaseHelper.DeleteSaveGame(saveGameID);
         }
 
         public async Task<(List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames)> GetAllSaveGames(User user)
         {
-            throw new NotImplementedException();
-        }
+            List<SaveGame> ownedSaveGames = await _databaseHelper.GetAllSaveGamesByUser(user);
 
-        public async Task<List<SaveGame>> GetAllSaveGames()
-        {
-            throw new NotImplementedException();
+            return (ownedSaveGames, new());
         }
 
         public async Task<SaveGame?> GetSaveGame(string saveGameID)

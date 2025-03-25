@@ -34,7 +34,7 @@ namespace BreakingBank.Helpers
 
         public async Task<bool> SaveGameExists(string saveGameID)
         {
-            await using var command = _dataSource.CreateCommand("SELECT 1 FROM savegames WHERE savegame_id = @savegame_id LIMIT 1");
+            await using NpgsqlCommand command = _dataSource.CreateCommand("SELECT 1 FROM savegames WHERE savegame_id = @savegame_id LIMIT 1");
             command.Parameters.AddWithValue("savegame_id", Guid.Parse(saveGameID));
 
             await using var reader = await command.ExecuteReaderAsync();
@@ -48,7 +48,11 @@ namespace BreakingBank.Helpers
 
         public async Task<bool> DeleteSaveGame(string saveGameID)
         {
-            return false;
+            await using NpgsqlCommand command = _dataSource.CreateCommand("DELETE FROM savegames WHERE savegame_id = @savegame_id");
+            command.Parameters.AddWithValue("savegame_id", Guid.Parse(saveGameID));
+
+            int affectedRows = await command.ExecuteNonQueryAsync();
+            return affectedRows > 0;
         }
 
         public async Task<SaveGame?> GetSaveGame(string saveGameID)
@@ -73,10 +77,24 @@ namespace BreakingBank.Helpers
 
         public async Task<List<SaveGame>> GetAllSaveGamesByUser(User user)
         {
-            return new List<SaveGame>();
+            List<SaveGame> saveGames = new();
+
+            await using var command = _dataSource.CreateCommand(@"SELECT data FROM savegames WHERE user_id = @user_id");
+
+            command.Parameters.AddWithValue("user_id", user.ID);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                string json = reader.GetString(0);
+                if (SaveGame.Parse(json, out SaveGame saveGame))
+                    saveGames.Add(saveGame);
+            }
+
+            return saveGames;
         }
 
-        public string SerializeSavegame(SaveGame saveGame)
+        private string SerializeSavegame(SaveGame saveGame)
         {
             JsonSerializerOptions options = new();
             options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
