@@ -125,21 +125,25 @@ namespace BreakingBank.Models.SaveGame
 
                 _requiredResourceAmount.Add(EconomyData.Resource.Paper, 10);
                 _requiredResourceAmount.Add(EconomyData.Resource.Cartridges, 5);
+
                 _resourceOnFinished = EconomyData.Resource.DirtyMoney;
             }
             else if (Type == UnitType.WashingMachine)
             {
                 CapacityPerCount = 25;
                 RequiredClicks = 50;
+
                 _requiredResourceAmount.Add(EconomyData.Resource.DirtyMoney, 1);
+
                 _resourceOnFinished = EconomyData.Resource.WetMoney;
             }
             else if (Type == UnitType.Dryer)
             {
                 CapacityPerCount = 15;
-                
                 RequiredClicks = 30;
+
                 _requiredResourceAmount.Add(EconomyData.Resource.WetMoney, 1);
+
                 _resourceOnFinished = EconomyData.Resource.CleanMoney;
             }
         }
