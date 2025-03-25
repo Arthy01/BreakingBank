@@ -21,20 +21,6 @@ namespace BreakingBank.Controllers
             _saveGameService = saveGameService;
         }
 
-        [HttpGet("username")]
-        public ActionResult<string> GetUsername()
-        {
-            User user = Models.User.GetByClaims(User);
-            string? username = User?.Identity?.Name;
-
-            if (string.IsNullOrEmpty(username))
-            {
-                return Unauthorized("Benutzername nicht gefunden.");
-            }
-
-            return Ok($"Username: {user.Username} ({user.ID})");
-        }
-
         [HttpPost("create")]
         public async Task<ActionResult<string>> CreateSession(string saveGameID)
         {
@@ -114,6 +100,17 @@ namespace BreakingBank.Controllers
         public ActionResult GetAllSessions()
         {
             return Ok(_sessionService.GetAllActiveSessions());
+        }
+
+        [HttpPost("save")]
+        public ActionResult SaveSession()
+        {
+            User user = Models.User.GetByClaims(User);
+
+            if (!_sessionService.SaveSession(user, out string msg))
+                return BadRequest(msg);
+
+            return Ok(msg);
         }
     }
 }

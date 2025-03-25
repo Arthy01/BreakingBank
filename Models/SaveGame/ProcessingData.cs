@@ -2,12 +2,16 @@
 {
     public class ProcessingData : SaveGameData
     {
-        public DirtyField<ProcessingUnit> Printers { get; } = new() { Value = new ProcessingUnit() };
-        public DirtyField<ProcessingUnit> WashingMachines { get; } = new() { Value = new ProcessingUnit() };
-        public DirtyField<ProcessingUnit> Dryers { get; } = new() { Value = new ProcessingUnit() };
+        public DirtyField<ProcessingUnit> Printers { get; }
+        public DirtyField<ProcessingUnit> WashingMachines { get; }
+        public DirtyField<ProcessingUnit> Dryers { get; }
 
-        public ProcessingData()
+        public ProcessingData(EconomyData economyData)
         {
+            Printers = new() { Value = new ProcessingUnit(ProcessingUnit.UnitType.Printer, economyData) };
+            WashingMachines = new() { Value = new ProcessingUnit(ProcessingUnit.UnitType.WashingMachine, economyData) };
+            Dryers = new() { Value = new ProcessingUnit(ProcessingUnit.UnitType.Dryer, economyData) };
+
             RegisterEvents();
         }
 
@@ -36,9 +40,7 @@
         {
             unit.Value!.Count.OnDirtyStateChanged += () => { if (unit.Value!.Count.IsDirty) unit.SetDirty(); };
             unit.Value!.UsedCapacity.OnDirtyStateChanged += () => { if (unit.Value!.UsedCapacity.IsDirty) unit.SetDirty(); };
-            unit.Value!.MaxCapacity.OnDirtyStateChanged += () => { if (unit.Value!.MaxCapacity.IsDirty) unit.SetDirty(); };
             unit.Value!.CurrentClicks.OnDirtyStateChanged += () => { if (unit.Value!.CurrentClicks.IsDirty) unit.SetDirty(); };
-            unit.Value!.RequiredClicks.OnDirtyStateChanged += () => { if (unit.Value!.RequiredClicks.IsDirty) unit.SetDirty(); };
         }
 
         public override void ClearDirtyData()

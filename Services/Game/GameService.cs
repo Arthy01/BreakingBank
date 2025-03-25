@@ -105,13 +105,13 @@ namespace BreakingBank.Services.Game
                     session.SaveGame.Economy.Paper.Value += amount;
                     return;
                 case Clickable.Printer:
-                    session.SaveGame.Processing.Printers.Value!.CurrentClicks.Value += amount;
+                    session.SaveGame.Processing.Printers.Value!.HandleClick(amount);
                     return;
                 case Clickable.WashingMachine:
-                    session.SaveGame.Processing.WashingMachines.Value!.CurrentClicks.Value += amount;
+                    session.SaveGame.Processing.WashingMachines.Value!.HandleClick(amount);
                     return;
                 case Clickable.Dryer:
-                    session.SaveGame.Processing.Dryers.Value!.CurrentClicks.Value += amount;
+                    session.SaveGame.Processing.Dryers.Value!.HandleClick(amount);
                     return;
             }
         }

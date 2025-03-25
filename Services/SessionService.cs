@@ -108,7 +108,7 @@ namespace BreakingBank.Services
             session.Users.Remove(user);
             _sessionsByUser.Remove(user);
 
-            if (session.Users.Count == 0)
+            if (user.ID == session.SaveGame.MetaData.OwnerUserID)
             {
                 CloseSession(session);
             }
@@ -157,6 +157,23 @@ namespace BreakingBank.Services
         public Session? GetUserConnectedSession(User user)
         {
             return _activeSessions.Find(x => x.Users.Contains(user));
+        }
+
+        public bool SaveSession(User user, out string msg)
+        {
+            msg = "Session successfully saved!";
+
+            Session? session = GetUserConnectedSession(user);
+
+            if (session == null)
+            {
+                msg = $"User {user.ToString()} is not currently in a session!";
+                return false;
+            }
+
+            SaveGame saveGame = session.SaveGame;
+
+            return _saveGameService.UpdateSaveGame(saveGame).Result;
         }
     }
 }

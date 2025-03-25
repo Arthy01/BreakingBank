@@ -9,7 +9,7 @@ namespace BreakingBank.Models.SaveGame
         public MetaData MetaData { get; private set; }
 
         public EconomyData Economy { get; private set; } = new();
-        public ProcessingData Processing { get; private set; } = new();
+        public ProcessingData Processing { get; private set; }
         public UpgradeData Upgrades { get; private set; } = new();
 
         [JsonIgnore]
@@ -46,7 +46,7 @@ namespace BreakingBank.Models.SaveGame
                 if (economyData == null)
                     throw new Exception("Deserialization of EconomyData has failed!");
 
-                ProcessingData? processingData = DeserializeProcessingData(doc.RootElement);
+                ProcessingData? processingData = DeserializeProcessingData(doc.RootElement, economyData);
 
                 if (processingData == null)
                     throw new Exception("Deserialization of ProcessingData has failed!");
@@ -126,7 +126,7 @@ namespace BreakingBank.Models.SaveGame
                 );
         }
 
-        private static ProcessingData? DeserializeProcessingData(JsonElement root)
+        private static ProcessingData? DeserializeProcessingData(JsonElement root, EconomyData economyData)
         {
             if (!root.TryGetProperty("processing", out JsonElement processingDataElement))
                 return null;
@@ -140,27 +140,24 @@ namespace BreakingBank.Models.SaveGame
             if (!processingDataElement.TryGetProperty("washingMachines", out JsonElement washingMachinesDataElement))
                 return null;
 
-            ProcessingUnit? printerUnit = DeserializeProcessingUnit(printersDataElement);
+            ProcessingUnit? printerUnit = DeserializeProcessingUnit(ProcessingUnit.UnitType.Printer, economyData, printersDataElement);
             if (printerUnit == null) 
                 return null;
 
-            ProcessingUnit? washingUnit = DeserializeProcessingUnit(washingMachinesDataElement);
+            ProcessingUnit? washingUnit = DeserializeProcessingUnit(ProcessingUnit.UnitType.WashingMachine, economyData, washingMachinesDataElement);
             if (washingUnit == null) 
                 return null;
             
-            ProcessingUnit? dryerUnit = DeserializeProcessingUnit(dryersDataElement);
+            ProcessingUnit? dryerUnit = DeserializeProcessingUnit(ProcessingUnit.UnitType.Dryer, economyData, dryersDataElement);
             if (dryerUnit == null)
                 return null;
 
             return new ProcessingData(new() { Value = printerUnit }, new() { Value = washingUnit }, new() { Value = dryerUnit });
         }
 
-        private static ProcessingUnit? DeserializeProcessingUnit(JsonElement unitElement)
+        private static ProcessingUnit? DeserializeProcessingUnit(ProcessingUnit.UnitType type, EconomyData economyData, JsonElement unitElement)
         {
             if (!unitElement.TryGetProperty("count", out JsonElement countElement))
-                return null;
-
-            if (!unitElement.TryGetProperty("maxCapacity", out JsonElement maxCapacityElement))
                 return null;
 
             if (!unitElement.TryGetProperty("usedCapacity", out JsonElement usedCapacityElement))
@@ -169,15 +166,12 @@ namespace BreakingBank.Models.SaveGame
             if (!unitElement.TryGetProperty("currentClicks", out JsonElement currentClicksElement))
                 return null;
 
-            if (!unitElement.TryGetProperty("requiredClicks", out JsonElement requiredClicksElement))
-                return null;
-
             return new ProcessingUnit(
+                type,
+                economyData,
                 countElement.GetUInt64(), 
                 usedCapacityElement.GetUInt64(), 
-                maxCapacityElement.GetUInt64(), 
-                currentClicksElement.GetUInt64(), 
-                requiredClicksElement.GetUInt64()
+                currentClicksElement.GetUInt64()
                 );
         }
 
@@ -230,6 +224,7 @@ namespace BreakingBank.Models.SaveGame
         private SaveGame(MetaData metaData)
         {
             MetaData = metaData;
+            Processing = new(Economy);
 
             Initialize();
         }

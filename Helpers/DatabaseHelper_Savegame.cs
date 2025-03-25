@@ -79,7 +79,7 @@ namespace BreakingBank.Helpers
         {
             List<SaveGame> saveGames = new();
 
-            await using NpgsqlCommand command = _dataSource.CreateCommand(@"SELECT data FROM savegames WHERE user_id = @user_id");
+            await using NpgsqlCommand command = _dataSource.CreateCommand(@"SELECT data FROM savegames WHERE user_id = @user_id ORDER BY data->'metaData'->>'name' ASC");
 
             command.Parameters.AddWithValue("user_id", user.ID);
 
