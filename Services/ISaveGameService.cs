@@ -5,14 +5,14 @@ namespace BreakingBank.Services
 {
     public interface ISaveGameService
     {
-        string CreateSaveGame(User owner, string name);
-        void UpdateSaveGame(SaveGame saveGame);
-        SaveGame? GetSaveGame(string saveGameID);
-        (List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames) GetAllSaveGames(User user);
-        List<SaveGame> GetAllSaveGames();
-        bool SaveGameIDExists(string saveGameID);
+        Task<string> CreateSaveGame(User owner, string name);
+        Task<bool> UpdateSaveGame(SaveGame saveGame);
+        Task<SaveGame?> GetSaveGame(string saveGameID);
+        Task<(List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames)> GetAllSaveGames(User user);
+        Task<List<SaveGame>> GetAllSaveGames();
+        Task<bool> SaveGameIDExists(string saveGameID);
 
-        bool DeleteSaveGame(string saveGameID);
+        Task<bool> DeleteSaveGame(string saveGameID);
 
         /*
 

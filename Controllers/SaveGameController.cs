@@ -27,11 +27,9 @@ namespace BreakingBank.Controllers
         {
             Models.User user = Models.User.GetByClaims(User);
 
-            string id = _saveGameService.CreateSaveGame(user, saveGameName);
-            bool success = await _databaseHelper.CreateSaveGame(_saveGameService.GetSaveGame(id)!);
-
+            string id = await _saveGameService.CreateSaveGame(user, saveGameName);
             
-            return Ok($"Save game created with id {id} => " + success);
+            return Ok($"Save game created with id {id}");
         }
 
         [HttpGet("all")]
@@ -41,9 +39,9 @@ namespace BreakingBank.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetSaveGame(string saveGameID)
+        public async Task<ActionResult> GetSaveGame(string saveGameID)
         {
-            SaveGame? saveGame = _saveGameService.GetSaveGame(saveGameID);
+            SaveGame? saveGame = await _saveGameService.GetSaveGame(saveGameID);
 
             if (saveGame == null)
                 return BadRequest($"SaveGame with ID {saveGameID} does not exist!");
@@ -52,11 +50,11 @@ namespace BreakingBank.Controllers
         }
 
         [HttpDelete]
-        public ActionResult DeleteSaveGame(string saveGameID)
+        public async Task<ActionResult> DeleteSaveGame(string saveGameID)
         {
             User user = Models.User.GetByClaims(User);
 
-            SaveGame? saveGame = _saveGameService.GetSaveGame(saveGameID);
+            SaveGame? saveGame = await _saveGameService.GetSaveGame(saveGameID);
 
             if (saveGame == null)
                 return NotFound($"SaveGame with ID {saveGameID} does not exist!");
@@ -64,7 +62,7 @@ namespace BreakingBank.Controllers
             if (user.ID != saveGame.MetaData.OwnerUserID)
                 return Unauthorized($"User is not authorized to delete the SaveGame with ID {saveGameID}. Only the owner of the SaveGame can delete it.");
 
-            if (!_saveGameService.DeleteSaveGame(saveGameID))
+            if (!await _saveGameService.DeleteSaveGame(saveGameID))
                 return BadRequest("Something went wrong...");
 
             return Ok();

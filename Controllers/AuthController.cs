@@ -25,12 +25,6 @@ namespace BreakingBank.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AuthRequest request)
         {
-            string x = "{\"economy\":{\"paper\":187,\"wetMoney\":0,\"cartridges\":0,\"cleanMoney\":0,\"dirtyMoney\":0},\"metaData\":{\"id\":\"b8a3e7f1-ff3b-4c4b-85e4-544286f31d14\",\"name\":\"TestSaveGame\",\"ownerUserID\":1,\"coOwnerUserIDs\":[]},\"upgrades\":{\"upgrades\":[{\"name\":\"Test Upgrade\",\"level\":111,\"baseCost\":100,\"baseEffect\":1,\"description\":\"Test Description\",\"costIncrease\":50}]},\"processing\":{\"dryers\":{\"count\":2,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0},\"printers\":{\"count\":0,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0},\"washingMachines\":{\"count\":0,\"maxCapacity\":0,\"usedCapacity\":0,\"currentClicks\":0,\"requiredClicks\":0}}}";
-            bool s = SaveGame.Parse(x, out SaveGame saveGame);
-            Console.WriteLine(s + " => " + saveGame.Economy.Paper.Value + " | " + saveGame.Upgrades.Upgrades[0].Value.Level.Value + " | " + saveGame.Processing.Dryers.Value.Count.Value);
-            // TODO
-            // UserID needs to be the real userID not just the username
-
             AuthResponse response = await _databaseHelper.AuthUser(request);
 
             if (!response.Success)
@@ -38,33 +32,8 @@ namespace BreakingBank.Controllers
 
             User user = response.User!.Value;
             string token = _jwtTokenService.GenerateToken(user.Username, user.ID.ToString());
-            _logger.LogInformation("Issued Toke: " + token);
+            _logger.LogInformation("Issued Token: " + token);
             return Ok(new { Token = token });
-
-            /*
-            if (request.Username == "admin" && request.Password == "password123")
-            {
-                var token = _jwtTokenService.GenerateToken(request.Username, "1");
-                _logger.LogInformation("Issued Token: " + token);
-                return Ok(new { Token = token });
-            }
-
-            if (request.Username == "test1" && request.Password == "password123")
-            {
-                var token = _jwtTokenService.GenerateToken(request.Username, "2");
-                _logger.LogInformation("Issued Token: " + token);
-                return Ok(new { Token = token });
-            }
-
-            if (request.Username == "test2" && request.Password == "password123")
-            {
-                var token = _jwtTokenService.GenerateToken(request.Username, "3");
-                _logger.LogInformation("Issued Token: " + token);
-                return Ok(new { Token = token });
-            }
-            
-            return Unauthorized(new { Message = "Ungültige Anmeldeinformationen" });
-            */
         }
 
         [HttpPost("register")]

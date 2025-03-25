@@ -39,7 +39,7 @@ namespace BreakingBank.Services
                 return false;
             }
 
-            SaveGame? saveGame = _saveGameService.GetSaveGame(saveGameID);
+            SaveGame? saveGame = _saveGameService.GetSaveGame(saveGameID).Result;
 
             if (saveGame == null)
             {
@@ -148,6 +148,8 @@ namespace BreakingBank.Services
             {
                 _sessionsByUser.Remove(sessionUser);
             }
+
+            _saveGameService.UpdateSaveGame(session.SaveGame);
 
             OnSessionClosed?.Invoke(session);
         }

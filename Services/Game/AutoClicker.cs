@@ -64,7 +64,7 @@ namespace BreakingBank.Services.Game
                     if (clickable == GameService.Clickable.Undefined)
                         continue;
 
-                    double clicksPerSecond = 0.25; // Ausgedacht, wird duch upgrades bestimmt
+                    double clicksPerSecond = 0.0; // Ausgedacht, wird duch upgrades bestimmt
 
                     double clicksThisTick = clicksPerSecond / _gameSettings.TickRate;
 

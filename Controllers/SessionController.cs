@@ -36,11 +36,11 @@ namespace BreakingBank.Controllers
         }
 
         [HttpPost("create")]
-        public ActionResult<string> CreateSession(string saveGameID)
+        public async Task<ActionResult<string>> CreateSession(string saveGameID)
         {
             User user = Models.User.GetByClaims(User);
             
-            if (!_saveGameService.SaveGameIDExists(saveGameID))
+            if (!await _saveGameService.SaveGameIDExists(saveGameID))
             {
                 return BadRequest($"Save game with ID {saveGameID} does not exist!");
             }
@@ -56,11 +56,11 @@ namespace BreakingBank.Controllers
         }
 
         [HttpPost("join")]
-        public ActionResult<string> JoinSession(string saveGameID)
+        public async Task<ActionResult<string>> JoinSession(string saveGameID)
         {
             User user = Models.User.GetByClaims(User);
 
-            if (!_saveGameService.SaveGameIDExists(saveGameID))
+            if (!await _saveGameService.SaveGameIDExists(saveGameID))
             {
                 return BadRequest($"Save game with ID {saveGameID} does not exist!");
             }

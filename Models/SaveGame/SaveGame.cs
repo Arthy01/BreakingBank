@@ -234,7 +234,7 @@ namespace BreakingBank.Models.SaveGame
             Initialize();
         }
 
-        public SaveGame(MetaData metaData, EconomyData economyData, ProcessingData processingData, UpgradeData upgradeData)
+        private SaveGame(MetaData metaData, EconomyData economyData, ProcessingData processingData, UpgradeData upgradeData)
         {
             MetaData = metaData;
             Economy = economyData;

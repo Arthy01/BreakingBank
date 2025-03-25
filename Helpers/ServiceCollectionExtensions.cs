@@ -14,7 +14,7 @@ namespace BreakingBank.Helpers
             services.AddScoped<JWTService>();
 
             // Singleton
-            services.AddSingleton<ISaveGameService, SaveGameServiceMemory>();
+            services.AddSingleton<ISaveGameService, SaveGameServiceDatabase>();
             services.AddSingleton<SessionService>();
             services.AddSingleton<DatabaseHelper>();
 

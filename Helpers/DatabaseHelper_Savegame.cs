@@ -32,6 +32,15 @@ namespace BreakingBank.Helpers
             return affectedRows > 0;
         }
 
+        public async Task<bool> SaveGameExists(string saveGameID)
+        {
+            await using var command = _dataSource.CreateCommand("SELECT 1 FROM savegames WHERE savegame_id = @savegame_id LIMIT 1");
+            command.Parameters.AddWithValue("savegame_id", Guid.Parse(saveGameID));
+
+            await using var reader = await command.ExecuteReaderAsync();
+            return await reader.ReadAsync(); // true if at least 1 row is found
+        }
+
         public async Task<bool> DeleteSaveGame(SaveGame saveGame)
         {
             return await DeleteSaveGame(saveGame.MetaData.ID);
@@ -44,6 +53,21 @@ namespace BreakingBank.Helpers
 
         public async Task<SaveGame?> GetSaveGame(string saveGameID)
         {
+            await using NpgsqlCommand command = _dataSource.CreateCommand("SELECT * FROM savegames WHERE savegame_id = @savegame_id");
+            command.Parameters.AddWithValue("savegame_id", NpgsqlDbType.Uuid, Guid.Parse(saveGameID));
+
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            
+            while (await reader.ReadAsync())
+            {
+                string json = reader.GetString(1);
+
+                if (SaveGame.Parse(json, out SaveGame saveGame))
+                    return saveGame;
+
+                return null;
+            }
+
             return null;
         }
 
@@ -52,7 +76,7 @@ namespace BreakingBank.Helpers
             return new List<SaveGame>();
         }
 
-        private string SerializeSavegame(SaveGame saveGame)
+        public string SerializeSavegame(SaveGame saveGame)
         {
             JsonSerializerOptions options = new();
             options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

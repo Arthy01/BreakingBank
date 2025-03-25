@@ -15,6 +15,8 @@
         public UpgradeData(List<DirtyField<Upgrade>> upgrades)
         {
             Upgrades = upgrades;
+
+            RegisterEvents();
         }
 
         private void RegisterEvents()
