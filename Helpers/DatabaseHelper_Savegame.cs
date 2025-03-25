@@ -75,11 +75,11 @@ namespace BreakingBank.Helpers
             return null;
         }
 
-        public async Task<List<SaveGame>> GetAllSaveGamesByUser(User user)
+        public async Task<List<SaveGame>> GetOwnedSaveGamesByUser(User user)
         {
             List<SaveGame> saveGames = new();
 
-            await using var command = _dataSource.CreateCommand(@"SELECT data FROM savegames WHERE user_id = @user_id");
+            await using NpgsqlCommand command = _dataSource.CreateCommand(@"SELECT data FROM savegames WHERE user_id = @user_id");
 
             command.Parameters.AddWithValue("user_id", user.ID);
 

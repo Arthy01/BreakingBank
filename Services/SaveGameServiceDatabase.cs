@@ -26,11 +26,11 @@ namespace BreakingBank.Services
             return await _databaseHelper.DeleteSaveGame(saveGameID);
         }
 
-        public async Task<(List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames)> GetAllSaveGames(User user)
+        public async Task<List<SaveGame>> GetOwnedSaveGames(User user)
         {
-            List<SaveGame> ownedSaveGames = await _databaseHelper.GetAllSaveGamesByUser(user);
+            List<SaveGame> ownedSaveGames = await _databaseHelper.GetOwnedSaveGamesByUser(user);
 
-            return (ownedSaveGames, new());
+            return ownedSaveGames;
         }
 
         public async Task<SaveGame?> GetSaveGame(string saveGameID)

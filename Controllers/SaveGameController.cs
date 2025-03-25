@@ -14,12 +14,10 @@ namespace BreakingBank.Controllers
     public class SaveGameController : ControllerBase
     {
         private readonly ISaveGameService _saveGameService;
-        private readonly DatabaseHelper _databaseHelper;
 
-        public SaveGameController(ISaveGameService saveGameService, DatabaseHelper databaseHelper)
+        public SaveGameController(ISaveGameService saveGameService)
         {
             _saveGameService = saveGameService;
-            _databaseHelper = databaseHelper;
         }
 
         [HttpPost("create")]
@@ -67,9 +65,9 @@ namespace BreakingBank.Controllers
         {
             User user = Models.User.GetByClaims(User);
 
-            (List<SaveGame> ownedSaveGames, List<SaveGame> coOwnedSaveGames) = await _saveGameService.GetAllSaveGames(user);
+            List<SaveGame> ownedSaveGames = await _saveGameService.GetOwnedSaveGames(user);
 
-            return Ok(new { Owned = ownedSaveGames, CoOwned = coOwnedSaveGames });
+            return Ok(new { OwnedSaveGames = ownedSaveGames });
         }
     }
 }
