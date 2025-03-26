@@ -268,12 +268,12 @@ namespace BreakingBank.Models.SaveGame
             if (data.DirtyData.Count > 0)
             {
                 _dirtyData[fieldName.ToCamelCase()] = data.DirtyData;
-                Console.WriteLine("DIRTY STATE CHANGED (SET DIRTY): " + fieldName);
+                //Console.WriteLine("DIRTY STATE CHANGED (SET DIRTY): " + fieldName);
             }
             else
             {
                 _dirtyData.Remove(fieldName.ToCamelCase());
-                Console.WriteLine("DIRTY STATE CHANGED (CLEAR DIRTY): " + fieldName);
+                //Console.WriteLine("DIRTY STATE CHANGED (CLEAR DIRTY): " + fieldName);
             }
         }
     }

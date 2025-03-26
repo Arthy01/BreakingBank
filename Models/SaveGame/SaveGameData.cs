@@ -30,8 +30,6 @@ namespace BreakingBank.Models.SaveGame
             if (field.Value == null)
                 return;
 
-            Console.WriteLine("SET DIRTY: " + fieldName);
-
             var fieldType = typeof(T);
 
             // Falls `T` eine komplexe Klasse ist, prüfen wir die DirtyFields darin
