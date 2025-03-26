@@ -7,7 +7,7 @@
             // EmployeeCount
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeCount_Paper, "Paper-Mitarbeiter", "Erhöht die Anzahl an Papier-Mitarbeitern", 0, 100, 50, 0, 1) },
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeCount_Cartridge, "Toner-Mitarbeiter", "Erhöht die Anzahl an Toner-Mitarbeitern", 0, 100, 50, 0, 1) },
-            new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeCount_Printer, "Druck-Mitarbeiter", "Erhöht die Anzahl an Druck-Mitarbeitern", 0, 100, 50, 1, 0) },
+            new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeCount_Printer, "Druck-Mitarbeiter", "Erhöht die Anzahl an Druck-Mitarbeitern", 0, 100, 50, 0, 1) },
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeCount_WashingMachine, "Wasch-Mitarbeiter", "Erhöht die Anzahl an Wasch-Mitarbeitern", 0, 100, 50, 0, 1) },
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeCount_Dryer, "Trocken-Mitarbeiter", "Erhöht die Anzahl an Trocken-Mitarbeitern", 0, 100, 50, 0, 1) },
 
