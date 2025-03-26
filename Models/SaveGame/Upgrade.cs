@@ -65,13 +65,13 @@
         public int GetEffectInt()
         {
             // Every 10 Levels, 10% Bonus
-            return (int)(BaseEffect + ((Level.Value * EffectIncrease * (1 + (Level.Value / 10) * 0.5))));
+            return (int)(BaseEffect + ((Level.Value * EffectIncrease * (1 + (Level.Value / 10) * 0.1))));
         }
 
         public double GetEffectDouble()
         {
             // Every 10 Levels, 10% Bonus
-            return BaseEffect + (Level.Value * EffectIncrease * (1 + (Level.Value / 10) * 0.5));
+            return BaseEffect + (Level.Value * EffectIncrease * (1 + (Level.Value / 10) * 0.1));
         }
 
         public bool CanBuy()

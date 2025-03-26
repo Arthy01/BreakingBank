@@ -103,17 +103,24 @@ namespace BreakingBank.Models.SaveGame
 
         private void HandleProcessContinueClick(ulong amount)
         {
-            if (CurrentClicks.Value + amount >= RequiredClicks)
+            CurrentClicks.Value += amount;
+
+            if (CurrentClicks.Value >= RequiredClicks)
                 HandleFinishProcess();
-            else
-                CurrentClicks.Value += amount;
         }
 
         private void HandleFinishProcess()
         {
             _economyData.AddResource(_resourceOnFinished, UsedCapacity.Value);
+            ulong leftOverClicks = CurrentClicks.Value - RequiredClicks;
+
             CurrentClicks.Value = 0;
             UsedCapacity.Value = 0;
+
+            Console.WriteLine("-------- LEFTOVER CLICKS: " + leftOverClicks + " --------");
+
+            if (leftOverClicks > 0)
+                HandleClick(leftOverClicks);
         }
 
         private void Configure()
