@@ -10,7 +10,7 @@ namespace BreakingBank.Models.SaveGame
 
         public EconomyData Economy { get; private set; } = new();
         public ProcessingData Processing { get; private set; }
-        public UpgradeData Upgrades { get; private set; } = new();
+        public UpgradeData Upgrades { get; private set; }
 
         [JsonIgnore]
         public IReadOnlyDictionary<string, object> DirtyData => _dirtyData;
@@ -51,7 +51,7 @@ namespace BreakingBank.Models.SaveGame
                 if (processingData == null)
                     throw new Exception("Deserialization of ProcessingData has failed!");
 
-                UpgradeData? upgradeData = DeserializeUpgradeData(doc.RootElement);
+                UpgradeData? upgradeData = DeserializeUpgradeData(doc.RootElement, economyData);
 
                 if (upgradeData == null)
                     throw new Exception("Deserialization of UpgradeData has failed!");
@@ -175,7 +175,7 @@ namespace BreakingBank.Models.SaveGame
                 );
         }
 
-        private static UpgradeData? DeserializeUpgradeData(JsonElement root)
+        private static UpgradeData? DeserializeUpgradeData(JsonElement root, EconomyData economyData)
         {
             if (!root.TryGetProperty("upgrades", out JsonElement upgradesDataElement))
                 return null;
@@ -210,9 +210,7 @@ namespace BreakingBank.Models.SaveGame
                 if (!upgradeElement.TryGetProperty("effectIncrease", out JsonElement effectIncreaseElement))
                     continue;
 
-                upgradesList.Add(new DirtyField<Upgrade>()
-                {
-                    Value = new Upgrade(
+                Upgrade upgrade = new Upgrade(
                     (Upgrade.UpgradeID)idElement.GetInt32(),
                     nameElement.GetString(),
                     descriptionElement.GetString(),
@@ -221,11 +219,15 @@ namespace BreakingBank.Models.SaveGame
                     costIncreaseElement.GetUInt64(),
                     baseEffectElement.GetDouble(),
                     effectIncreaseElement.GetDouble()
-                    )
+                    );
+
+                upgradesList.Add(new DirtyField<Upgrade>()
+                {
+                    Value = upgrade
                 });
             }
 
-            return new UpgradeData(upgradesList);
+            return new UpgradeData(upgradesList, economyData);
         }
 
 
@@ -233,6 +235,7 @@ namespace BreakingBank.Models.SaveGame
         {
             MetaData = metaData;
             Processing = new(Economy);
+            Upgrades = new(Economy);
 
             Initialize();
         }

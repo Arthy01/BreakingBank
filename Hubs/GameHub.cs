@@ -93,7 +93,7 @@ namespace BreakingBank.Hubs
             }
         }
 
-        public void Upgrade()
+        public void Upgrade(Upgrade.UpgradeID upgradeID)
         {
             User user = User.GetByClaims(Context.User);
 
@@ -102,7 +102,8 @@ namespace BreakingBank.Hubs
             if (session == null)
                 return;
 
-            session.SaveGame.Upgrades.Upgrades[0].Value!.Buy();
+            session.SaveGame.Upgrades.Upgrades.Find(x => x.Value!.ID == upgradeID)?.Value?.Buy();
+            //session.SaveGame.Upgrades.Upgrades[0].Value!.Buy();
         }
 
         public async void GetSaveGame()

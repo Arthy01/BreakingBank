@@ -48,6 +48,18 @@ namespace BreakingBank.Services
                 return false;
             }
 
+            if (saveGame.MetaData.OwnerUserID != user.ID)
+            {
+                msg = $"SaveGame with ID {saveGameID} is not owned by the user. The user is not permittet to create a session for this SaveGame!";
+                return false;
+            }
+
+            if (_activeSessions.Find(x => x.SaveGame.MetaData.ID == saveGameID) != null)
+            {
+                msg = $"There is already a Session with ID {saveGameID}. Try to join it instead of creating a new session!";
+                return false;
+            }
+
             Session session = new Session(saveGame);
 
             _activeSessions.Add(session);
@@ -108,7 +120,7 @@ namespace BreakingBank.Services
             session.Users.Remove(user);
             _sessionsByUser.Remove(user);
 
-            if (user.ID == session.SaveGame.MetaData.OwnerUserID)
+            if (user.ID == session.SaveGame.MetaData.OwnerUserID || session.Users.Count == 0)
             {
                 CloseSession(session);
             }

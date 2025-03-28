@@ -29,16 +29,26 @@
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.Player_Efficiency, "Spieler-Effizienz", "Erhöht den Wert deiner eigenen Klicks", 0, 200, 100, 1, 1) }
         };
 
-        public UpgradeData()
+        public UpgradeData(EconomyData economyData)
         {
+            SetEconomyDataForUpgrades(economyData);
             RegisterEvents();
         }
 
-        public UpgradeData(List<DirtyField<Upgrade>> upgrades)
+        public UpgradeData(List<DirtyField<Upgrade>> upgrades, EconomyData economyData)
         {
             Upgrades = upgrades;
 
+            SetEconomyDataForUpgrades(economyData);
             RegisterEvents();
+        }
+
+        private void SetEconomyDataForUpgrades(EconomyData economyData)
+        {
+            foreach (DirtyField<Upgrade> upgrade in Upgrades)
+            {
+                upgrade.Value!.SetEconomyData(economyData);
+            }
         }
 
         private void RegisterEvents()

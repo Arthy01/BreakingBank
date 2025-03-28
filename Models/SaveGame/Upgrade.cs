@@ -11,6 +11,8 @@
         public double BaseEffect { get; }
         public double EffectIncrease { get; }
 
+        private EconomyData? _economyData;
+
         public enum UpgradeID
         {
             Undefined,
@@ -50,6 +52,11 @@
             Level.OnDirtyStateChanged += () => HandleDirtyStateChanged(Level, nameof(Level));
         }
 
+        public void SetEconomyData(EconomyData economyData)
+        {
+            _economyData = economyData;
+        }
+
         public override void ClearDirtyData()
         {
             Level.ClearDirty();
@@ -76,14 +83,14 @@
 
         public bool CanBuy()
         {
-            return true;
+            return _economyData!.CleanMoney.Value >= GetCost();
         }
 
         public void Buy()
         {
             if (!CanBuy()) return;
 
-            //game.Money -= GetCost();
+            _economyData!.CleanMoney.Value -= GetCost();
             Level.Value++;
         }
     }
