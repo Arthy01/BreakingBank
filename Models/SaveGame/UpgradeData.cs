@@ -1,4 +1,6 @@
-﻿namespace BreakingBank.Models.SaveGame
+﻿using System.Runtime.Versioning;
+
+namespace BreakingBank.Models.SaveGame
 {
     public class UpgradeData : SaveGameData
     {
@@ -55,7 +57,7 @@
         {
             foreach (DirtyField<Upgrade> upgradeField in Upgrades)
             {
-                upgradeField.OnDirtyStateChanged += () => HandleDirtyStateChanged(upgradeField, upgradeField.Value!.Name);
+                upgradeField.OnDirtyStateChanged += () => HandleDirtyStateChanged(upgradeField, upgradeField.Value!.Name + "_" + upgradeField.Value!.ID);
                 upgradeField.Value!.OnDirtyStateChanged += () => { if (upgradeField.Value!.Level.IsDirty) upgradeField.SetDirty(); };
             }
 
