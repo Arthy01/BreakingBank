@@ -51,7 +51,7 @@ namespace BreakingBank.Models.SaveGame
                 if (processingData == null)
                     throw new Exception("Deserialization of ProcessingData has failed!");
 
-                UpgradeData? upgradeData = DeserializeUpgradeData(doc.RootElement, economyData);
+                UpgradeData? upgradeData = DeserializeUpgradeData(doc.RootElement, economyData, processingData);
 
                 if (upgradeData == null)
                     throw new Exception("Deserialization of UpgradeData has failed!");
@@ -175,7 +175,7 @@ namespace BreakingBank.Models.SaveGame
                 );
         }
 
-        private static UpgradeData? DeserializeUpgradeData(JsonElement root, EconomyData economyData)
+        private static UpgradeData? DeserializeUpgradeData(JsonElement root, EconomyData economyData, ProcessingData processingData)
         {
             if (!root.TryGetProperty("upgrades", out JsonElement upgradesDataElement))
                 return null;
@@ -227,7 +227,7 @@ namespace BreakingBank.Models.SaveGame
                 });
             }
 
-            return new UpgradeData(upgradesList, economyData);
+            return new UpgradeData(upgradesList, economyData, processingData);
         }
 
 
@@ -235,7 +235,7 @@ namespace BreakingBank.Models.SaveGame
         {
             MetaData = metaData;
             Processing = new(Economy);
-            Upgrades = new(Economy);
+            Upgrades = new(Economy, Processing);
 
             Initialize();
         }

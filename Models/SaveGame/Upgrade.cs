@@ -12,6 +12,7 @@
         public double EffectIncrease { get; }
 
         private EconomyData? _economyData;
+        private ProcessingData? _processingData;
 
         public enum UpgradeID
         {
@@ -35,6 +36,10 @@
             EmployeeEfficiency_WashingMachine,
             EmployeeEfficiency_Dryer,
 
+            ProcessingCount_Printer,
+            ProcessingCount_WashingMachine,
+            ProcessingCount_Dryer,
+
             Player_Efficiency
         }
 
@@ -55,6 +60,11 @@
         public void SetEconomyData(EconomyData economyData)
         {
             _economyData = economyData;
+        }
+
+        public void SetProcessingData(ProcessingData processingData)
+        {
+            _processingData = processingData;
         }
 
         public override void ClearDirtyData()
@@ -92,6 +102,22 @@
 
             _economyData!.CleanMoney.Value -= GetCost();
             Level.Value++;
+            
+            switch (ID)
+            {
+                case UpgradeID.ProcessingCount_Printer:
+                    _processingData!.Printers.Value!.Count.Value += 1;
+                    break;
+                case UpgradeID.ProcessingCount_WashingMachine:
+                    _processingData!.WashingMachines.Value!.Count.Value += 1;
+                    break;
+                case UpgradeID.ProcessingCount_Dryer:
+                    _processingData!.Dryers.Value!.Count.Value += 1;
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

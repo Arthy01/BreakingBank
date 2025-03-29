@@ -27,29 +27,35 @@ namespace BreakingBank.Models.SaveGame
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeEfficiency_WashingMachine, "Wasch-Effizienz", "Erhöht den Wert eines Klicks von Wasch-Mitarbeitern", 0, 100, 50, 1, 0.1) },
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.EmployeeEfficiency_Dryer, "Trocken-Effizienz", "Erhöht den Wert eines Klicks von Trocken-Mitarbeitern", 0, 100, 50, 1, 0.1) },
 
+            // ProcessingCounts
+            new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.ProcessingCount_Printer, "Druckeranzahl", "Erhöht die Anzahl an Druckern", 0, 100, 50, 1, 1) },
+            new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.ProcessingCount_WashingMachine, "Waschmaschinenanzahl", "Erhöht die Anzahl an Waschmaschinen", 0, 100, 50, 1, 1) },
+            new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.ProcessingCount_Dryer, "Trockneranzahl", "Erhöht die Anzahl an Trocknern", 0, 100, 50, 1, 1) },
+
             // Player-Effizienz
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.Player_Efficiency, "Spieler-Effizienz", "Erhöht den Wert deiner eigenen Klicks", 0, 200, 100, 1, 1) }
         };
 
-        public UpgradeData(EconomyData economyData)
+        public UpgradeData(EconomyData economyData, ProcessingData processingData)
         {
-            SetEconomyDataForUpgrades(economyData);
+            SetDatasForUpgrades(economyData, processingData);
             RegisterEvents();
         }
 
-        public UpgradeData(List<DirtyField<Upgrade>> upgrades, EconomyData economyData)
+        public UpgradeData(List<DirtyField<Upgrade>> upgrades, EconomyData economyData, ProcessingData processingData)
         {
             Upgrades = upgrades;
 
-            SetEconomyDataForUpgrades(economyData);
+            SetDatasForUpgrades(economyData, processingData);
             RegisterEvents();
         }
 
-        private void SetEconomyDataForUpgrades(EconomyData economyData)
+        private void SetDatasForUpgrades(EconomyData economyData, ProcessingData processingData)
         {
             foreach (DirtyField<Upgrade> upgrade in Upgrades)
             {
                 upgrade.Value!.SetEconomyData(economyData);
+                upgrade.Value!.SetProcessingData(processingData);
             }
         }
 
