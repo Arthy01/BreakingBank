@@ -8,7 +8,6 @@ namespace BreakingBank.Models.SaveGame
 
         [JsonInclude] public ulong CapacityPerCount { get; private set; }
         [JsonInclude] public ulong RequiredClicks { get; private set; }
-        [JsonInclude] public ulong PricePerCount { get; private set; }
 
         public DirtyField<ulong> Count { get; } = new() { Value = 1 };
         public DirtyField<ulong> UsedCapacity { get; } = new();
@@ -130,7 +129,6 @@ namespace BreakingBank.Models.SaveGame
             {
                 CapacityPerCount = 0;
                 RequiredClicks = 15;
-                PricePerCount = 1000;
 
                 _requiredResourceAmount.Add(EconomyData.Resource.Paper, 10);
                 _requiredResourceAmount.Add(EconomyData.Resource.Cartridges, 5);
@@ -141,7 +139,6 @@ namespace BreakingBank.Models.SaveGame
             {
                 CapacityPerCount = 25;
                 RequiredClicks = 50;
-                PricePerCount = 2000;
 
                 _requiredResourceAmount.Add(EconomyData.Resource.DirtyMoney, 1);
 
@@ -151,7 +148,6 @@ namespace BreakingBank.Models.SaveGame
             {
                 CapacityPerCount = 15;
                 RequiredClicks = 30;
-                PricePerCount = 3000;
 
                 _requiredResourceAmount.Add(EconomyData.Resource.WetMoney, 1);
 
