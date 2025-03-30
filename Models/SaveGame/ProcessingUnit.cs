@@ -81,7 +81,7 @@ namespace BreakingBank.Models.SaveGame
                 _economyData.RemoveResource(EconomyData.Resource.Paper, printersToLoad * requiredPaperPerPrinter);
                 _economyData.RemoveResource(EconomyData.Resource.Cartridges, printersToLoad * requiredCartridgesPerPrinter);
 
-                UsedCapacity.Value = printersToLoad * requiredPaperPerPrinter;
+                UsedCapacity.Value = printersToLoad * (requiredPaperPerPrinter + requiredCartridgesPerPrinter);
             }
             else
             {
