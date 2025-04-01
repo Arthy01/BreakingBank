@@ -51,7 +51,7 @@
         {
             if (!CanBuy()) return;
 
-            _economyData!.CleanMoney.Value -= Cost();
+            _economyData!.CleanMoney.Value -= Cost;
             IsPurchased.Value = true;
         }
     }
