@@ -74,13 +74,13 @@ namespace BreakingBank.Models.SaveGame
         {
             foreach (DirtyField<Upgrade> upgradeField in Upgrades)
             {
-                upgradeField.OnDirtyStateChanged += () => HandleDirtyStateChanged(upgradeField, upgradeField.Value!.Name + "_" + (int)upgradeField.Value!.ID);
+                upgradeField.OnDirtyStateChanged += () => HandleDirtyStateChanged(upgradeField, "upgrade_" + upgradeField.Value!.Name + "_" + (int)upgradeField.Value!.ID);
                 upgradeField.Value!.OnDirtyStateChanged += () => { if (upgradeField.Value!.Level.IsDirty) upgradeField.SetDirty(); };
             }
 
             foreach (DirtyField<Investment> investmentField in Investments)
             {
-                investmentField.OnDirtyStateChanged += () => HandleDirtyStateChanged(investmentField, investmentField.Value!.Name + "_" + (int)investmentField.Value!.ID);
+                investmentField.OnDirtyStateChanged += () => HandleDirtyStateChanged(investmentField, "investment_" + investmentField.Value!.Name + "_" + (int)investmentField.Value!.ID);
                 investmentField.Value!.OnDirtyStateChanged += () => { if (investmentField.Value!.IsPurchased.IsDirty) investmentField.SetDirty(); };
             }
         }
