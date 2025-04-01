@@ -96,5 +96,39 @@ namespace BreakingBank.Controllers
 
             return Ok(new { CurrentEffectInt = upgrade.GetEffectInt(), CurrentEffectDbl = upgrade.GetEffectDouble() });
         }
+
+        [HttpGet("investments")]
+        public ActionResult<List<dynamic>> GetInvestments(Investment.InvestmentID id = Investment.InvestmentID.Undefined)
+        {
+            User user = Models.User.GetByClaims(User);
+
+            Session? session = _sessionService.GetSessionByUser(user);
+
+            if (session == null)
+                return BadRequest("User is not connected to a session!");
+
+            List<dynamic> result = new();
+
+            if (id == Investment.InvestmentID.Undefined)
+            {
+                foreach (DirtyField<Investment> investment in session.SaveGame.Upgrades.Investments)
+                {
+                    if (investment.Value != null)
+                        result.Add(investment.Value);
+                }
+            }
+            else
+            {
+                Investment? investment = session.SaveGame.Upgrades.Investments.Find(x => x.Value.ID == id).Value;
+
+                if (investment != null)
+                    result.Add(investment);
+            }
+
+            if (result.Count == 0)
+                return NotFound("No Investment with ID " + id + " has been found!");
+
+            return Ok(new { Investments = result });
+        }
     }
 }
