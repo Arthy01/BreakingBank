@@ -2,14 +2,18 @@
 {
     public class Investment : SaveGameData
     {
+        public InvestmentID ID { get; }
         public string Name { get; }
         public string Description { get; }
         public DirtyField<bool> IsPurchased { get; } = new();
         public ulong Cost { get; }
         public ulong RevenuePerSecond { get; }
 
-        public Investment(string name, string description, bool isPurchased, ulong cost, ulong revenuePerSecond)
+        private EconomyData? _economyData;
+
+        public Investment(InvestmentID id, string name, string description, bool isPurchased, ulong cost, ulong revenuePerSecond)
         {
+            ID = id;
             Name = name;
             Description = description;
             IsPurchased = new DirtyField<bool>() { Value = isPurchased };
@@ -17,6 +21,11 @@
             RevenuePerSecond = revenuePerSecond;
 
             IsPurchased.OnDirtyStateChanged += () => HandleDirtyStateChanged(IsPurchased, nameof(IsPurchased));
+        }
+
+        public void SetEconomyData(EconomyData economyData)
+        {
+            _economyData = economyData;
         }
 
         public override void ClearDirtyData()
@@ -28,14 +37,14 @@
 
         public bool CanBuy()
         {
-            return true;
+            return _economyData!.CleanMoney.Value >= Cost;
         }
 
         public void Buy()
         {
             if (!CanBuy()) return;
 
-            //game.Money -= GetCost();
+            _economyData!.CleanMoney.Value -= Cost();
             IsPurchased.Value = true;
         }
     }
