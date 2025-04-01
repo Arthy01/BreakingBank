@@ -44,7 +44,7 @@
 
         public bool CanBuy()
         {
-            return _economyData!.CleanMoney.Value >= Cost;
+            return !IsPurchased.Value && _economyData!.CleanMoney.Value >= Cost;
         }
 
         public void Buy()
