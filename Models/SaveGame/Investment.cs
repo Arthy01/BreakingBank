@@ -13,9 +13,22 @@
 
         public enum InvestmentID
         {
-            Undefined, 
+            Undefined,
 
-            TestInvestment
+            Laundromat,
+            Pizzeria,
+            SelfStorage,
+            Gym,
+            FranchiseRestaurant,
+            LuxuryHotel,
+            SoccerClub,
+            PrivateBank,
+            StreamingPlatform,
+            TelecommunicationsNetwork,
+            ChipFactory,
+            SpaceCompany,
+            MultinationalHolding,
+            BuyTheWorld
         }
 
         public Investment(InvestmentID id, string name, string description, bool isPurchased, ulong cost, ulong revenuePerSecond)
