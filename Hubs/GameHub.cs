@@ -103,7 +103,18 @@ namespace BreakingBank.Hubs
                 return;
 
             session.SaveGame.Upgrades.Upgrades.Find(x => x.Value!.ID == upgradeID)?.Value?.Buy();
-            //session.SaveGame.Upgrades.Upgrades[0].Value!.Buy();
+        }
+
+        public void Invest(Investment.InvestmentID investmentID)
+        {
+            User user = User.GetByClaims(Context.User);
+
+            Session? session = _sessionService.GetSessionByUser(user);
+
+            if (session == null)
+                return;
+
+            session.SaveGame.Upgrades.Investments.Find(x => x.Value!.ID == investmentID)?.Value?.Buy();
         }
 
         public async void GetSaveGame()
