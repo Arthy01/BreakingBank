@@ -1,8 +1,10 @@
 ﻿using BreakingBank.Hubs;
 using BreakingBank.Models;
 using BreakingBank.Models.SaveGame;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using System.Data;
 
 namespace BreakingBank.Services.Game
 {
@@ -16,6 +18,8 @@ namespace BreakingBank.Services.Game
         private readonly GameSettings _gameSettings;
 
         private readonly AutoClicker _autoClicker;
+
+        private int _investmentMod = 0;
 
         public enum Clickable
         {
@@ -56,7 +60,38 @@ namespace BreakingBank.Services.Game
         {
             HandleAutoClicker();
 
+            HandleInvestments();
+
             SendDirtyDataToAllClients();
+        }
+
+        private void HandleInvestments()
+        {
+            _investmentMod = ++_investmentMod % (int)_gameSettings.TickRate;
+
+            if (_investmentMod != 0)
+                return;
+
+            GenerateInvestmentMoney();
+        }
+
+        private void GenerateInvestmentMoney()
+        {
+            IReadOnlyList<Session> sessions = _sessionService.GetAllActiveSessions();
+
+            foreach (Session session in sessions)
+            {
+                Task.Run(async () =>
+                {
+                    foreach (DirtyField<Investment> investment in session.SaveGame.Upgrades.Investments)
+                    {
+                        if (!investment.Value!.IsPurchased.Value)
+                            continue;
+
+                        session.SaveGame.Economy.AddResource(EconomyData.Resource.CleanMoney, investment.Value!.RevenuePerSecond);
+                    }
+                });
+            }
         }
 
         private void SendDirtyDataToAllClients()

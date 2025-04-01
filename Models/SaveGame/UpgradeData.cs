@@ -36,26 +36,37 @@ namespace BreakingBank.Models.SaveGame
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.Player_Efficiency, "Spieler-Effizienz", "Erhöht den Wert deiner eigenen Klicks", 0, 200, 100, 1, 1) }
         };
 
+        public List<DirtyField<Investment>> Investments { get; } = new()
+        {
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Test", "TestD", false, 1000, 10) }
+        };
+
         public UpgradeData(EconomyData economyData, ProcessingData processingData)
         {
-            SetDatasForUpgrades(economyData, processingData);
+            SetDatasForUpgradesAndInvestments(economyData, processingData);
             RegisterEvents();
         }
 
-        public UpgradeData(List<DirtyField<Upgrade>> upgrades, EconomyData economyData, ProcessingData processingData)
+        public UpgradeData(List<DirtyField<Upgrade>> upgrades, List<DirtyField<Investment>> investmentList, EconomyData economyData, ProcessingData processingData)
         {
             Upgrades = upgrades;
+            Investments = investmentList;
 
-            SetDatasForUpgrades(economyData, processingData);
+            SetDatasForUpgradesAndInvestments(economyData, processingData);
             RegisterEvents();
         }
 
-        private void SetDatasForUpgrades(EconomyData economyData, ProcessingData processingData)
+        private void SetDatasForUpgradesAndInvestments(EconomyData economyData, ProcessingData processingData)
         {
             foreach (DirtyField<Upgrade> upgrade in Upgrades)
             {
                 upgrade.Value!.SetEconomyData(economyData);
                 upgrade.Value!.SetProcessingData(processingData);
+            }
+
+            foreach (DirtyField<Investment> investment in Investments)
+            {
+                investment.Value!.SetEconomyData(economyData);
             }
         }
 
@@ -65,6 +76,12 @@ namespace BreakingBank.Models.SaveGame
             {
                 upgradeField.OnDirtyStateChanged += () => HandleDirtyStateChanged(upgradeField, upgradeField.Value!.Name + "_" + (int)upgradeField.Value!.ID);
                 upgradeField.Value!.OnDirtyStateChanged += () => { if (upgradeField.Value!.Level.IsDirty) upgradeField.SetDirty(); };
+            }
+
+            foreach (DirtyField<Investment> investmentField in Investments)
+            {
+                investmentField.OnDirtyStateChanged += () => HandleDirtyStateChanged(investmentField, investmentField.Value!.Name + "_" + (int)investmentField.Value!.ID);
+                investmentField.Value!.OnDirtyStateChanged += () => { if (investmentField.Value!.IsPurchased.IsDirty) investmentField.SetDirty(); };
             }
         }
 

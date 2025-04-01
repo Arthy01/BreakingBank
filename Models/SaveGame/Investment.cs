@@ -15,7 +15,7 @@
         {
             Undefined, 
 
-
+            TestInvestment
         }
 
         public Investment(InvestmentID id, string name, string description, bool isPurchased, ulong cost, ulong revenuePerSecond)

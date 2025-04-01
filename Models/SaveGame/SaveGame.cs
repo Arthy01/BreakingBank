@@ -183,6 +183,9 @@ namespace BreakingBank.Models.SaveGame
             if (!upgradesDataElement.TryGetProperty("upgrades", out JsonElement upgradesElement))
                 return null;
 
+            if (!upgradesDataElement.TryGetProperty("investments", out JsonElement investmentsElement))
+                return null;
+
             List<DirtyField<Upgrade>> upgradesList = new();
             foreach (JsonElement upgradeElement in upgradesElement.EnumerateArray())
             {
@@ -227,7 +230,43 @@ namespace BreakingBank.Models.SaveGame
                 });
             }
 
-            return new UpgradeData(upgradesList, economyData, processingData);
+            List<DirtyField<Investment>> investmentsList = new();
+            foreach (JsonElement investmentElement in investmentsElement.EnumerateArray())
+            {
+                if (!investmentElement.TryGetProperty("id", out JsonElement idElement))
+                    continue;
+
+                if (!investmentElement.TryGetProperty("name", out JsonElement nameElement))
+                    continue;
+
+                if (!investmentElement.TryGetProperty("description", out JsonElement descriptionElement))
+                    continue;
+
+                if (!investmentElement.TryGetProperty("isPurchased", out JsonElement isPurchasedElement))
+                    continue;
+
+                if (!investmentElement.TryGetProperty("cost", out JsonElement costElement))
+                    continue;
+
+                if (!investmentElement.TryGetProperty("revenuePerSecond", out JsonElement revenuePerSecondElement))
+                    continue;
+
+                Investment investment = new Investment(
+                    (Investment.InvestmentID)idElement.GetInt32(),
+                    nameElement.GetString(),
+                    descriptionElement.GetString(),
+                    isPurchasedElement.GetBoolean(),
+                    costElement.GetUInt64(),
+                    revenuePerSecondElement.GetUInt64()
+                    );
+
+                investmentsList.Add(new DirtyField<Investment>()
+                {
+                    Value = investment
+                });
+            }
+
+            return new UpgradeData(upgradesList, investmentsList, economyData, processingData);
         }
 
 
