@@ -140,7 +140,7 @@ namespace BreakingBank
 
             var app = builder.Build();
 
-            app.UseCors(builder => builder.WithOrigins("http://breakingbank.de:5009", "http://www.breakingbank.de:5009", "https://breakingbank.de:5009", "https://www.breakingbank.de:5009").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(builder => builder.WithOrigins("http://breakingbank.de:5009", "http://breakingbank.de", "http://www.breakingbank.de:5009", "http://www.breakingbank.de", "https://breakingbank.de:5009", "https://breakingbank.de", "https://www.breakingbank.de:5009").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 
             if (app.Environment.IsDevelopment() || true)
             {

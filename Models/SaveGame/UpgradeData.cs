@@ -38,7 +38,21 @@ namespace BreakingBank.Models.SaveGame
 
         public List<DirtyField<Investment>> Investments { get; } = new()
         {
-            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Test", "TestD", false, 1000, 10) }
+            // Investments
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Waschsalon", "Saubere Wäsche, saubere Gewinne.", false, 10000, 10) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Pizzeria", "Pizza ist nicht nur lecker – sie ist auch perfekt, um andere, weniger legale Einnahmequellen unauffällig zu verstecken.", false, 50000, 50) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Self-Storage-Anlage", "Die Leute haben zu viele Sachen und brauchen Platz. Vermiete leere Räume für volle Profite!", false, 250000, 250) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Fitnessstudio", "Die meisten zahlen, aber erscheinen nie. Perfektes Geschäftsmodell.", false, 1000000, 1000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Franchise-Restaurant", "Frittierte Gewinne – ein Erfolgsrezept, das immer funktioniert.", false, 5000000, 5000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Luxushotel", "Exklusive Suiten für zahlungskräftige Gäste – und Minibar-Preise, die astronomisch sind.", false, 20000000, 20000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Fußballverein", "Ticketverkäufe, TV-Rechte und Trikot-Deals – ein profitabler Spielzug!", false, 100000000, 100000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Privatbank", "Zinsen, Kredite und Kontogebühren – Geld mit Geld verdienen.", false, 500000000, 500000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Streaming-Plattform", "Filme, Serien und jede Menge fragwürdige Eigenproduktionen – das Abo-Geld fließt trotzdem!", false, 2000000000, 2000000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Telekommunikationsnetzwerk", "Jeder braucht Internet und Handys. Du kassierst mit jedem Anruf und jeder Nachricht.", false, 10000000000, 10000000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Chipfabrik", "Ohne Mikrochips läuft nichts – und deine Fabriken liefern die unverzichtbare Technologie.", false, 50000000000, 50000000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Raumfahrtunternehmen", "Satellitenstarts, Marskolonien – die Zukunft ist interplanetar.", false, 250000000000, 250000000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Multinationale Holding", "Beteiligungen an den größten Konzernen der Welt – wahre Marktmacht.", false, 1000000000000, 1000000000) },
+            new DirtyField<Investment>(){ Value = new Investment(Investment.InvestmentID.TestInvestment, "Die Welt kaufen", "Herzlichen Glückwunsch, du besitzt jetzt alles. Dein Wort ist Gesetz!", false, 1000000000000000, 1000000000000) },
         };
 
         public UpgradeData(EconomyData economyData, ProcessingData processingData)
