@@ -5,7 +5,6 @@ namespace BreakingBank.Models
     {
         public List<User> Users { get; } = new();
         public SaveGame.SaveGame SaveGame { get; private set; }
-        public readonly object SaveGameLock = new();
 
         public Session(SaveGame.SaveGame saveGame) 
         {

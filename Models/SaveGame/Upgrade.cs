@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace BreakingBank.Models.SaveGame
+﻿namespace BreakingBank.Models.SaveGame
 {
     public class Upgrade : SaveGameData
     {
@@ -15,8 +13,6 @@ namespace BreakingBank.Models.SaveGame
 
         private EconomyData? _economyData;
         private ProcessingData? _processingData;
-
-        [JsonIgnore] public readonly object _upgradeLock = new();
 
         public enum UpgradeID
         {
@@ -104,15 +100,8 @@ namespace BreakingBank.Models.SaveGame
         {
             if (!CanBuy()) return;
 
-            lock (_economyData!.EconomyLock)
-            {
-                _economyData!.CleanMoney.Value -= GetCost();
-            }
-
-            lock (_upgradeLock)
-            {
-                Level.Value++;
-            }
+            _economyData!.CleanMoney.Value -= GetCost();
+            Level.Value++;
             
             switch (ID)
             {

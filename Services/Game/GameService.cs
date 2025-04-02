@@ -81,13 +81,16 @@ namespace BreakingBank.Services.Game
 
             foreach (Session session in sessions)
             {
-                foreach (DirtyField<Investment> investment in session.SaveGame.Upgrades.Investments)
+                Task.Run(async () =>
                 {
-                    if (!investment.Value!.IsPurchased.Value)
-                        continue;
+                    foreach (DirtyField<Investment> investment in session.SaveGame.Upgrades.Investments)
+                    {
+                        if (!investment.Value!.IsPurchased.Value)
+                            continue;
 
-                    session.SaveGame.Economy.AddResource(EconomyData.Resource.CleanMoney, investment.Value!.RevenuePerSecond);
-                }
+                        session.SaveGame.Economy.AddResource(EconomyData.Resource.CleanMoney, investment.Value!.RevenuePerSecond);
+                    }
+                });
             }
         }
 
@@ -97,11 +100,14 @@ namespace BreakingBank.Services.Game
 
             foreach (Session session in sessions)
             {
-                if (session.SaveGame.DirtyData.Count == 0)
-                    return;
+                Task.Run(async () =>
+                {
+                    if (session.SaveGame.DirtyData.Count == 0)
+                        return;
 
-                _hubContext.Clients.Group(session.SaveGame.MetaData.ID).ReceiveTick(session.SaveGame.DirtyData);
-                session.SaveGame.ClearDirtyData();
+                    await _hubContext.Clients.Group(session.SaveGame.MetaData.ID).ReceiveTick(session.SaveGame.DirtyData);
+                    session.SaveGame.ClearDirtyData();
+                });
             }
         }
 

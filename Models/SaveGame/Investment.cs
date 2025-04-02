@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace BreakingBank.Models.SaveGame
+﻿namespace BreakingBank.Models.SaveGame
 {
     public class Investment : SaveGameData
     {
@@ -12,8 +10,6 @@ namespace BreakingBank.Models.SaveGame
         public ulong RevenuePerSecond { get; }
 
         private EconomyData? _economyData;
-
-        [JsonIgnore] public readonly object _investmentLock = new();
 
         public enum InvestmentID
         {
@@ -68,15 +64,8 @@ namespace BreakingBank.Models.SaveGame
         {
             if (!CanBuy()) return;
 
-            lock (_economyData!.EconomyLock)
-            {
-                _economyData!.CleanMoney.Value -= Cost;
-            }
-
-            lock (_investmentLock)
-            {
-                IsPurchased.Value = true;
-            }
+            _economyData!.CleanMoney.Value -= Cost;
+            IsPurchased.Value = true;
         }
     }
 }
