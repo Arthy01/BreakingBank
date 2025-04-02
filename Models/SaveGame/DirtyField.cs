@@ -8,15 +8,20 @@ namespace BreakingBank.Models.SaveGame
 
         public bool IsDirty { get; private set; } = true;
 
+        private readonly object _lock = new();
+
         public T? Value
         {
             get => _value;
             set
             {
                 if (!Equals(_value, value)) 
-                { 
-                    _value = value;
-                    IsDirty = true;
+                {
+                    lock (_lock)
+                    {
+                        _value = value;
+                        IsDirty = true;
+                    }
                     OnDirtyStateChanged?.Invoke();
                 }
             }
@@ -26,13 +31,21 @@ namespace BreakingBank.Models.SaveGame
 
         public void ClearDirty()
         {
-            IsDirty = false;
+            lock (_lock)
+            {
+                IsDirty = false;
+            }
+
             OnDirtyStateChanged?.Invoke();
         }
 
         public void SetDirty()
         {
-            IsDirty = true;
+            lock (_lock)
+            {
+                IsDirty = true;
+            }
+
             OnDirtyStateChanged?.Invoke();
         }
     }

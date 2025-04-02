@@ -18,6 +18,8 @@ namespace BreakingBank.Models.SaveGame
 
         private EconomyData _economyData;
 
+        [JsonIgnore] public readonly object UnitLock = new();
+
         public enum UnitType
         {
             Printer,

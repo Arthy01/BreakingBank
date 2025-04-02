@@ -11,6 +11,8 @@ namespace BreakingBank.Models.SaveGame
         public DirtyField<ulong> Cartridges { get; } = new();
         public DirtyField<ulong> Paper { get; } = new();
 
+        [JsonIgnore] public readonly object EconomyLock = new();
+
         public enum Resource
         {
             CleanMoney,
@@ -41,52 +43,59 @@ namespace BreakingBank.Models.SaveGame
 
         public void AddResource(Resource resource, ulong amount)
         {
-            switch (resource)
+            lock (EconomyLock)
             {
-                case Resource.CleanMoney:
-                    CleanMoney.Value += amount;
-                    return;
-                case Resource.WetMoney:
-                    WetMoney.Value += amount;
-                    return;
-                case Resource.DirtyMoney:
-                    DirtyMoney.Value += amount;
-                    return;
-                case Resource.Cartridges:
-                    Cartridges.Value += amount;
-                    return;
-                case Resource.Paper:
-                    Paper.Value += amount;
-                    return;
-                default:
-                    throw new NotImplementedException();
+                switch (resource)
+                {
+                    case Resource.CleanMoney:
+                        CleanMoney.Value += amount;
+                        return;
+                    case Resource.WetMoney:
+                        WetMoney.Value += amount;
+                        return;
+                    case Resource.DirtyMoney:
+                        DirtyMoney.Value += amount;
+                        return;
+                    case Resource.Cartridges:
+                        Cartridges.Value += amount;
+                        return;
+                    case Resource.Paper:
+                        Paper.Value += amount;
+                        return;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
 
         public void RemoveResource(Resource resource, ulong amount)
         {
-            if (GetResourceAmount(resource) < amount)
-                return;
-
-            switch (resource)
+            lock (EconomyLock)
             {
-                case Resource.CleanMoney:
-                    CleanMoney.Value -= amount;
+
+                if (GetResourceAmount(resource) < amount)
                     return;
-                case Resource.WetMoney:
-                    WetMoney.Value -= amount;
-                    return;
-                case Resource.DirtyMoney:
-                    DirtyMoney.Value -= amount;
-                    return;
-                case Resource.Cartridges:
-                    Cartridges.Value -= amount;
-                    return;
-                case Resource.Paper:
-                    Paper.Value -= amount;
-                    return;
-                default:
-                    throw new NotImplementedException();
+
+                switch (resource)
+                {
+                    case Resource.CleanMoney:
+                        CleanMoney.Value -= amount;
+                        return;
+                    case Resource.WetMoney:
+                        WetMoney.Value -= amount;
+                        return;
+                    case Resource.DirtyMoney:
+                        DirtyMoney.Value -= amount;
+                        return;
+                    case Resource.Cartridges:
+                        Cartridges.Value -= amount;
+                        return;
+                    case Resource.Paper:
+                        Paper.Value -= amount;
+                        return;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
 
