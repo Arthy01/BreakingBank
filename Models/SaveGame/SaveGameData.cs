@@ -12,13 +12,17 @@ namespace BreakingBank.Models.SaveGame
 
         private Dictionary<string, object> _dirtyData = new();
 
+        private readonly object _dirtyDataLock = new();
+
         public virtual void ClearDirtyData()
         {
-            if (_dirtyData.Count == 0)
-                return;
+            lock (_dirtyDataLock)
+            {
+                if (_dirtyData.Count == 0)
+                    return;
 
-            _dirtyData.Clear();
-
+                _dirtyData.Clear();
+            }
             OnDirtyStateChanged?.Invoke();
         }
 
@@ -57,13 +61,19 @@ namespace BreakingBank.Models.SaveGame
                 if (!dirtySubFields.Any())
                     return;
 
-                // Speichere nur die wirklich dirty Subfelder
-                _dirtyData[fieldName.ToCamelCase()] = dirtySubFields;
+                lock (_dirtyDataLock)
+                {
+                    // Speichere nur die wirklich dirty Subfelder
+                    _dirtyData[fieldName.ToCamelCase()] = dirtySubFields;
+                }
             }
             else
             {
-                // Wenn es ein primitiver Typ ist, speichern wir ihn direkt
-                _dirtyData[fieldName.ToCamelCase()] = field.Value;
+                lock (_dirtyDataLock)
+                {
+                    // Wenn es ein primitiver Typ ist, speichern wir ihn direkt
+                    _dirtyData[fieldName.ToCamelCase()] = field.Value;
+                }
             }
 
             OnDirtyStateChanged?.Invoke();
