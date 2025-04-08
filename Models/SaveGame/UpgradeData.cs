@@ -33,7 +33,7 @@ namespace BreakingBank.Models.SaveGame
             new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.ProcessingCount_Dryer, "Trockneranzahl", "Erhöht die Anzahl an Trocknern", 0, 10, 10, 1, 1) },
 
             // Player-Effizienz
-            new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.Player_Efficiency, "Spieler-Effizienz", "Erhöht den Wert deiner eigenen Klicks", 0, 5, 5, 1, 1) }
+            new DirtyField<Upgrade>{ Value = new Upgrade(Upgrade.UpgradeID.Player_Efficiency, "Spieler-Effizienz", "Erhöht den Wert deiner eigenen Klicks", 0, 50, 100, 1, 1) }
         };
 
         public List<DirtyField<Investment>> Investments { get; } = new()
