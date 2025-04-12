@@ -1,0 +1,139 @@
+{
+  "author": "",
+  "category": "",
+  "extensionNamespace": "",
+  "fullName": "",
+  "gdevelopVersion": "",
+  "helpPath": "",
+  "iconUrl": "",
+  "name": "Test",
+  "previewIconUrl": "",
+  "shortDescription": "",
+  "version": "",
+  "description": "",
+  "tags": [],
+  "authorIds": [],
+  "dependencies": [],
+  "globalVariables": [],
+  "sceneVariables": [],
+  "eventsFunctions": [],
+  "eventsBasedBehaviors": [],
+  "eventsBasedObjects": [
+    {
+      "areaMaxX": 366,
+      "areaMaxY": 52,
+      "areaMaxZ": 0,
+      "areaMinX": 0,
+      "areaMinY": 0,
+      "areaMinZ": 0,
+      "defaultName": "",
+      "description": "",
+      "fullName": "",
+      "isUsingLegacyInstancesRenderer": false,
+      "name": "MyObject",
+      "eventsFunctions": [],
+      "propertyDescriptors": [],
+      "objects": [
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "Headline",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Breaking Bank",
+          "font": "mononoki-Regular.ttf",
+          "textAlignment": "left",
+          "characterSize": 50,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          },
+          "content": {
+            "bold": false,
+            "isOutlineEnabled": false,
+            "isShadowEnabled": false,
+            "italic": false,
+            "outlineColor": "255;255;255",
+            "outlineThickness": 2,
+            "shadowAngle": 90,
+            "shadowBlurRadius": 2,
+            "shadowColor": "0;0;0",
+            "shadowDistance": 4,
+            "shadowOpacity": 127,
+            "smoothed": true,
+            "underlined": false,
+            "text": "Breaking Bank",
+            "font": "mononoki-Regular.ttf",
+            "textAlignment": "left",
+            "verticalTextAlignment": "top",
+            "characterSize": 50,
+            "color": "0;0;0"
+          }
+        }
+      ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "Headline"
+          }
+        ]
+      },
+      "objectsGroups": [],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera3DNearPlaneDistance": 3,
+          "cameraType": "",
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "isLocked": false,
+          "name": "",
+          "renderingType": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Headline",
+          "persistentUuid": "35e1b219-52af-4601-b727-261e85ee97ee",
+          "width": 0,
+          "x": 0,
+          "y": 0,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ]
+    }
+  ]
+}

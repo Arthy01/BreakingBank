@@ -1,0 +1,36 @@
+{
+  "associatedLayout": "Main Menu",
+  "name": "GameLoad",
+  "instances": [
+    {
+      "angle": 0,
+      "customSize": true,
+      "depth": 48,
+      "height": 84,
+      "keepRatio": true,
+      "layer": "",
+      "name": "GreenButton",
+      "persistentUuid": "f4dedcef-b234-49ea-be07-e12dd9c73dfd",
+      "width": 252,
+      "x": 474,
+      "y": 271,
+      "zOrder": 2,
+      "numberProperties": [],
+      "stringProperties": [],
+      "initialVariables": []
+    }
+  ],
+  "editionSettings": {
+    "grid": false,
+    "gridType": "rectangular",
+    "gridWidth": 32,
+    "gridHeight": 32,
+    "gridOffsetX": 0,
+    "gridOffsetY": 0,
+    "gridColor": 10401023,
+    "gridAlpha": 0.8,
+    "snap": false,
+    "zoomFactor": 0.546875,
+    "windowMask": false
+  }
+}
